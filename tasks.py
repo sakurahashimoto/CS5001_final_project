@@ -1,4 +1,8 @@
+#system
 import sys
+import time
+#async let the timer run and let user do other thing at the same time
+import asyncio 
 
 TASK_LIST_FILE = "/tmp/cs5001_tasklist.txt"
 COMPLETED_TASK_LIST_FILE = "/tmp/cs5001_completed_tasklist.txt"
@@ -9,7 +13,9 @@ def load_list(file_path):
     result = []
     #create file if TASK_LIST_FILE does not exist
     #results of open is assigned to fp (fp = open)
-    with open(file_path, "r+") as fp:
+    #a+ append, read, and write 
+    #fp = open(file_path)
+    with open(file_path, "a+") as fp:
         #return all of the list (tasks)
         #function readlines()
         #fp is TASK_LIST_FILE
@@ -36,8 +42,11 @@ def remove_task(task_list):
     task_list.pop(index)
 
 
-def start_timer():
-    pass
+def start_timer(num_seconds):
+    for i in range(num_seconds,0, -1):
+        print(f"Seconds is  {i}")
+        time.sleep(1)
+
 
 
 def view_tasks(task_list):
@@ -100,7 +109,7 @@ def tasks():
             view_tasks(task_list)
 
         elif user_answer == "3":
-            start_timer()
+            start_timer(5)
         elif user_answer == "4":
             view_tasks(task_list)
         elif user_answer == "5":
