@@ -1,0 +1,5 @@
+ai_task_coach/.env
+__pycache__/
+.venv/
+data/
+.idea/
