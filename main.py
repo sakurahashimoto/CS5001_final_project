@@ -1,8 +1,5 @@
 # system
-from curses.ascii import isdigit
-from email.policy import default
 import sys
-import time
 import quotes
 import compliment_quotes
 import json
