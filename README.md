@@ -29,4 +29,4 @@ by prompting you to break tasks up into mangeable chunks and gamifying getting s
 4. On github create a new pull request
 5. Rebase and merge the pull request
 6. Pull down latest changes: `jj git fetch`
-7. Prepare to make new changes: `jj git rebase -d main`
+7. Prepare to make new changes: `jj rebase -d main`
