@@ -20,6 +20,12 @@ class Timer:
     def start(self, minutes):
         """
         Start countdown timer.
+        
+        How it works:
+        1. Main loop runs every second, updating the progress bar
+        2. Uses non-blocking input check (select) to detect ENTER key
+        3. If user presses ENTER, shows pause menu
+        4. Loop ends when time runs out OR user chooses 'done'
 
         :param minutes: how many minutes to count down
         :return: "completed" if timer finished, "stopped" if user stopped early
@@ -34,7 +40,7 @@ class Timer:
         print("    Press ENTER to pause or finish early")
         print()
 
-        # Main timer loop - handles both countdown and input
+        # Main loop: check for input, display time, wait 1 second, repeat
         while self.remaining_seconds > 0 and self.is_running:
             if self.is_paused:
                 time.sleep(0.1)

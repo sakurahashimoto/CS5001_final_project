@@ -1,7 +1,7 @@
 """
 task_coach.py
-Main app that connects everything together.
-Single Responsibility: Orchestrate the task coaching flow.
+Main app - coordinates all the other modules (timer, display, storage, etc.)
+to run the task coaching session from start to finish.
 """
 
 from session import Session
@@ -26,15 +26,18 @@ class TaskCoach:
 
     def start(self):
         """Start the task coach app."""
-        today_completed = self.storage.get_today_completed_count()
-        self.display.show_welcome(today_completed)
+        total_completed = self.storage.get_total_completed_count()
+        self.display.show_welcome(total_completed)
         self._show_main_menu()
 
 
     def _show_main_menu(self):
-        """Show main menu for users."""
+        """
+        Show main menu for users.
+        Runs in infinite loop until user chooses to quit (choice 'q').
+        """
         while True:
-            # Check for unfinished session
+            # Check if user has a saved session from before
             unfinished = self.storage.get_unfinished_session()
 
             print("What would you like to do?")
@@ -355,6 +358,10 @@ class TaskCoach:
         Ask user how the task went after timer.
 
         :param task: the Task that was just worked on
+        
+        Note: If user chooses "Need more time", _extend_time() will call
+        this function again after the extra timer finishes.
+        That's why we return early in choice "2" - to avoid double next_task().
         """
         print()
         print("How did it go?")
@@ -369,8 +376,10 @@ class TaskCoach:
             task.complete()
             self.display.show_encouragement("completed")
         elif choice == "2":
+            # _extend_time will call _handle_task_completion again after timer
+            # so we return here to avoid calling next_task twice
             self._extend_time(task)
-            return  # _extend_time handles next_task internally
+            return
         elif choice == "3":
             task.skip()
             self.display.show_encouragement("skipped")

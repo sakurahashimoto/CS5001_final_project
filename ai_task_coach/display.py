@@ -25,18 +25,18 @@ class Display:
         }
 
 
-    def show_welcome(self, today_completed=0):
+    def show_welcome(self, total_completed=0):
         """
         Show welcome message when app starts.
 
-        :param today_completed: number of sessions completed today
+        :param total_completed: total number of completed sessions
         """
         self._print()
         self._print("=" * 50)
         self._print("   🎯 TASK COACH - Break it down, get it done!")
         self._print("=" * 50)
-        if today_completed > 0:
-            self._print(f"   📊 Today: {today_completed} session(s) completed!")
+        if total_completed > 0:
+            self._print(f"   📊 Total: {total_completed} session(s) completed!")
         self._print()
 
 

@@ -45,7 +45,7 @@ class Storage:
     def __init__(self, filename="data/sessions.json"):
         """
         Create storage handler.
-        Single Responsibility: Manage session data persistence.
+        Saves/loads session data to/from a JSON file.
 
         :param filename: path to the JSON file
         """
@@ -147,23 +147,18 @@ class Storage:
         return completed
 
 
-    def get_today_completed_count(self):
+    def get_total_completed_count(self):
         """
-        Get the number of sessions completed today.
+        Get total number of completed sessions (all time).
 
-        :return: count of sessions completed today
+        :return: count of all completed sessions
         """
-        from datetime import datetime
-
-        today = datetime.now().strftime("%Y-%m-%d")
         data = self._load_file()
         count = 0
 
         for session_id, session_dict in data.items():
             if session_dict["status"] == "completed":
-                # Check if created_at starts with today's date
-                if session_dict.get("created_at", "").startswith(today):
-                    count += 1
+                count += 1
 
         return count
 

@@ -1,7 +1,7 @@
 """
 input_handler.py
-Handles all user input operations.
-Single Responsibility: Get and validate user input.
+Handles all user input - getting goals, times, menu choices, etc.
+Also validates input using AI when needed (e.g., checking if goal makes sense).
 """
 
 
@@ -77,12 +77,19 @@ class InputHandler:
         """
         Get menu choice from user.
 
-        :param options: list of valid options (e.g., ["1", "2", "q"])
+        Keeps asking until user enters one of the allowed options.
+
+        :param options: list of valid options (lowercase strings, e.g., ["1", "2", "q"])
         :param prompt: prompt to display
         :return: user's choice (lowercase, stripped)
         """
-        choice = self._input(prompt).strip().lower()
-        return choice
+        while True:
+            choice = self._input(prompt).strip().lower()
+
+            if choice in options:
+                return choice
+
+            self._print("Invalid choice. Please try again.")
 
 
     def get_task_number(self, max_num):
@@ -153,19 +160,15 @@ class InputHandler:
     def get_focus(self):
         """
         Get focus area from user.
-        AI validates if input is a meaningful focus.
-        If AI says NO, treat as cancel.
+        Focus is just a clarification (e.g., "graphs", "chapter 3"),
+        so we accept any non-empty input without AI validation.
 
-        :return: valid focus string, or None if cancelled/invalid
+        :return: focus string, or None if cancelled (empty input)
         """
         self._print()
         focus = self._input("What would you like to focus on instead? (Press Enter to cancel): ").strip()
 
         if not focus:
-            return None
-
-        # AI validates - if not meaningful, treat as cancel
-        if self.ai and not self.ai.validate_goal(focus):
             return None
 
         return focus

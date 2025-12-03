@@ -149,6 +149,11 @@ class AIHelper:
     def _parse_response(self, response_text):
         """
         Parse AI response into a list of Task objects.
+        
+        Expected AI response format:
+            1 | Open textbook | 5
+            2 | Read chapter 1 | 15
+            3 | Take notes | 10
 
         :param response_text: raw text from AI
         :return: list of Task objects, or empty list if parsing fails
@@ -157,12 +162,15 @@ class AIHelper:
         lines = response_text.strip().split("\n")
 
         for line in lines:
+            # Skip lines that don't have the pipe separator
             if "|" in line:
                 parts = line.split("|")
 
+                # Must have exactly 3 parts: number | description | minutes
                 if len(parts) != 3:
-                    return []
+                    return []  # Invalid format - retry with new AI call
 
+                # Parse task number
                 try:
                     task_number = int(parts[0].strip())
                 except ValueError:
@@ -170,6 +178,7 @@ class AIHelper:
 
                 description = parts[1].strip()
 
+                # Parse minutes
                 try:
                     minutes = int(parts[2].strip())
                 except ValueError:
