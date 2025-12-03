@@ -2,20 +2,19 @@
 timer.py
 Countdown timer for each task.
 """
-import threading
 import time
+import sys
+import select
 
-from google.ai.generativelanguage_v1beta.services.permission_service.transports.rest import PermissionServiceRestStub
 
-
-# TODO Add pause()
 class Timer:
     def __init__(self):
         """Create a timer."""
         self.remaining_seconds = 0
         self.total_seconds = 0
-        self.is_running = False     # Flag to track if timer is active (False = not running)
-        self.stopped_early = False  # If user stops timer early
+        self.is_running = False
+        self.is_paused = False
+        self.stopped_early = False
 
 
     def start(self, minutes):
@@ -25,26 +24,34 @@ class Timer:
         :param minutes: how many minutes to count down
         :return: "completed" if timer finished, "stopped" if user stopped early
         """
-        self.total_seconds = minutes * 60           # Convert min to sec
+        self.total_seconds = minutes * 60
         self.remaining_seconds = self.total_seconds
         self.is_running = True
+        self.is_paused = False
         self.stopped_early = False
 
         print()
-        print("    Press ENTER to finish early")
+        print("    Press ENTER to pause or finish early")
         print()
 
-        # Start a thread to listen for Enter key
-        input_thread = threading.Thread(target=self._wait_for_input)
-        input_thread.daemon = True
-        input_thread.start()
-
-        # Keep running as long as time is left and timer is still running
-        # Each loop = 1 second passing in real life
+        # Main timer loop - handles both countdown and input
         while self.remaining_seconds > 0 and self.is_running:
+            if self.is_paused:
+                time.sleep(0.1)
+                continue
+
+            # Check for input (non-blocking)
+            if self._check_for_input():
+                self._handle_pause()
+
+            if not self.is_running:
+                break
+
             self._display_time()
             time.sleep(1)
             self.remaining_seconds -= 1
+
+        self.is_running = False
 
         if self.stopped_early:
             self._stopped_message()
@@ -54,11 +61,43 @@ class Timer:
             return "completed"
 
 
-    def _wait_for_input(self):
-        """Wait for user to press Enter."""
-        input()
-        self.is_running = False
-        self.stopped_early = True
+    def _check_for_input(self):
+        """
+        Check if user pressed Enter (non-blocking).
+
+        :return: True if input detected, False otherwise
+        """
+        try:
+            # Unix/macOS: use select for non-blocking check
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                sys.stdin.readline()
+                return True
+        except (ValueError, OSError, TypeError):
+            pass
+        return False
+
+
+    def _handle_pause(self):
+        """Handle pause menu."""
+        self.is_paused = True
+        print()
+        print()
+        print("  ⏸️  Paused!")
+
+        while True:
+            print("  Type 'resume' to continue, or 'done' to finish: ", end="", flush=True)
+            choice = input().strip().lower()
+
+            if choice == "done":
+                self.is_running = False
+                self.stopped_early = True
+                return
+            elif choice == "resume":
+                self.is_paused = False
+                print("\r  ▶️  Resumed! Press ENTER to pause" + " " * 25)
+                return
+            else:
+                print("  Invalid input. Please type 'resume' or 'done'.")
 
 
     def _display_time(self):
@@ -87,7 +126,27 @@ class Timer:
         bar = "█" * 20
         print(f"\r  {bar} 100% complete | Time left: 00:00")
         print()
+        self._play_alert_sound()
         print("⏰ Time's up! ⏰")
+
+
+    def _play_alert_sound(self):
+        """Play alert sound when timer finishes."""
+        import platform
+        import os
+
+        system = platform.system()
+
+        try:
+            if system == "Darwin":  # macOS
+                os.system('afplay /System/Library/Sounds/Glass.aiff &')
+            elif system == "Windows":
+                import winsound
+                winsound.MessageBeep()
+            else:  # Linux
+                print("\a")  # Terminal bell
+        except Exception:
+            print("\a")  # Fallback to terminal bell
 
 
     def _stopped_message(self):

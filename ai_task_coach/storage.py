@@ -45,6 +45,7 @@ class Storage:
     def __init__(self, filename="data/sessions.json"):
         """
         Create storage handler.
+        Single Responsibility: Manage session data persistence.
 
         :param filename: path to the JSON file
         """
@@ -146,6 +147,27 @@ class Storage:
         return completed
 
 
+    def get_today_completed_count(self):
+        """
+        Get the number of sessions completed today.
+
+        :return: count of sessions completed today
+        """
+        from datetime import datetime
+
+        today = datetime.now().strftime("%Y-%m-%d")
+        data = self._load_file()
+        count = 0
+
+        for session_id, session_dict in data.items():
+            if session_dict["status"] == "completed":
+                # Check if created_at starts with today's date
+                if session_dict.get("created_at", "").startswith(today):
+                    count += 1
+
+        return count
+
+
     def delete_session(self, session_id):
         """
         Delete a session by ID.
@@ -179,8 +201,15 @@ class Storage:
             )
             tasks.append(task)
 
-        return Session(goal=session_dict["goal"], status=session_dict["status"], tasks=tasks,
-                       current_task=session_dict["current_task"])
+        return Session(
+            goal=session_dict["goal"],
+            time_available=session_dict.get("time_available", 60),
+            status=session_dict["status"],
+            tasks=tasks,
+            current_task=session_dict["current_task"],
+            session_id=session_dict["session_id"],
+            created_at=session_dict["created_at"]
+        )
 
 
 if __name__ == "__main__":
