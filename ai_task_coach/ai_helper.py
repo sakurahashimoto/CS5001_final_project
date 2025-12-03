@@ -178,9 +178,11 @@ class AIHelper:
 
                 description = parts[1].strip()
 
-                # Parse minutes
+                # Parse minutes (must be positive)
                 try:
                     minutes = int(parts[2].strip())
+                    if minutes <= 0:
+                        return []  # Invalid time - retry with new AI call
                 except ValueError:
                     return []
 

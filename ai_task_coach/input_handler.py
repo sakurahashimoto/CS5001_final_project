@@ -130,7 +130,12 @@ class InputHandler:
         new_time = self._input(f"New time for '{task_description}' (current: {current_time} min): ").strip()
 
         try:
-            return int(new_time)
+            minutes = int(new_time)
+            if minutes > 0:
+                return minutes
+            else:
+                self._print("Invalid time.")
+                return None
         except ValueError:
             self._print("Invalid time. Please enter a number.")
             return None

@@ -54,7 +54,14 @@ class Storage:
 
 
     def _initialize(self):
-        """Create the file if it doesn't exist"""
+        """Create the data directory and file if they don't exist."""
+        import os
+
+        # Create parent directory if it doesn't exist
+        directory = os.path.dirname(self.filename)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+
         data = self._load_file()
         if data == {}:
             self._save_file({})
@@ -117,11 +124,11 @@ class Storage:
 
     def get_unfinished_session(self):
         """
-        Get all sessions that are not completed.
+        Get the first session that is not completed.
         paused: user did it
         in_progress: app closed unexpectedly
 
-        :return: list of Session objects
+        :return: Session object, or None if no unfinished session
         """
         data = self._load_file()
 

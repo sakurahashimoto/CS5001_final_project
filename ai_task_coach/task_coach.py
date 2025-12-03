@@ -156,31 +156,43 @@ class TaskCoach:
         self.display.show_tasks(self.current_session.tasks)
 
         can_regenerate = regenerate_count < 3
-        choice = self._show_confirm_menu(can_regenerate)
+        choice = self._show_confirm_menu(can_regenerate, regenerate_count)
 
         self._handle_confirm_choice(choice, regenerate_count, can_regenerate)
 
 
-    def _show_confirm_menu(self, can_regenerate):
+    def _show_confirm_menu(self, can_regenerate, regenerate_count):
         """
         Show task confirmation menu and get user choice.
 
         :param can_regenerate: whether regenerate options should be shown
+        :param regenerate_count: how many times user has regenerated so far
         :return: user's choice string
         """
         print("Are these tasks okay?")
+        if can_regenerate:
+            remaining = 3 - regenerate_count
+            print(f"(You can regenerate up to 3 times. Remaining: {remaining})")
+        else:
+            print("(You already used all 3 regenerate attempts.)")
+
         print("1. Yes, let's start!")
         print("2. Adjust time for a task")
+
+        # Only show (and accept) regenerate options if allowed
+        options = ["1", "2"]
 
         if can_regenerate:
             print("3. Too hard - make simpler")
             print("4. Not enough - need more detail")
             print("5. Different focus - let me specify what to work on")
+            options.extend(["3", "4", "5"])
 
         print("q. Quit")
         print()
 
-        return self.input.get_menu_choice(["1", "2", "3", "4", "5", "q"])
+        options.append("q")
+        return self.input.get_menu_choice(options)
 
 
     def _handle_confirm_choice(self, choice, regenerate_count, can_regenerate):
@@ -194,7 +206,7 @@ class TaskCoach:
         if choice == "1":
             self._run_session()
         elif choice == "2":
-            self._adjust_time()
+            self._adjust_time(regenerate_count)
         elif choice == "3" and can_regenerate:
             self._regenerate("too_hard", regenerate_count)
         elif choice == "4" and can_regenerate:
@@ -215,8 +227,12 @@ class TaskCoach:
         print("Session saved. See you next time!")
 
 
-    def _adjust_time(self):
-        """Let user adjust time for a specific task."""
+    def _adjust_time(self, regenerate_count):
+        """
+        Let user adjust time for a specific task.
+
+        :param regenerate_count: current regenerate count to preserve
+        """
         print()
         print("Which task do you want to adjust?")
 
@@ -226,7 +242,7 @@ class TaskCoach:
         task_num = self.input.get_task_number(len(self.current_session.tasks))
 
         if task_num is None:
-            self._confirm_tasks()
+            self._confirm_tasks(regenerate_count)
             return
 
         task = self.current_session.tasks[task_num - 1]
@@ -237,7 +253,7 @@ class TaskCoach:
             self.storage.save_session(self.current_session)
             print(f"Updated to {new_minutes} mins!")
 
-        self._confirm_tasks()
+        self._confirm_tasks(regenerate_count)
 
 
     def _regenerate(self, adjust_type, regenerate_count):
@@ -304,8 +320,8 @@ class TaskCoach:
                 self._complete_session()
                 return
 
-            # Handle regular tasks - returns False if user quit
-            if not self._handle_regular_task(task):
+            # Handle task - returns False if user quit
+            if not self._handle_task(task):
                 return
 
 
@@ -316,16 +332,16 @@ class TaskCoach:
         self.display.show_summary(self.current_session)
 
 
-    def _handle_regular_task(self, task):
+    def _handle_task(self, task):
         """
-        Handle a regular task.
+        Handle a single task (show info, run timer, handle completion).
 
         :param task: the Task to handle
         :return: True to continue session, False to quit
         """
         # Show current task with progress
         total_tasks = len(self.current_session.tasks)
-        completed_tasks = self.current_session.current_task
+        completed_tasks = sum(1 for t in self.current_session.tasks if t.status == "completed")
         print(f"📌 Task {task.task_number} of {total_tasks}: {task.description}")
         print(f"   Time: {task.timer_minutes} minutes")
         print(f"   Progress: {completed_tasks}/{total_tasks} completed")
