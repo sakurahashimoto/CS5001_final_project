@@ -5,6 +5,15 @@
 This project is a simple TODO application that helps you make progress on difficult tasks
 by prompting you to break tasks up into mangeable chunks and gamifying getting stuff done.
 
+### Running
+
+[uv](https://github.com/astral-sh/uv) is used to manage dependencies and provide a shared
+environment.
+
+To get started:
+* Fetch all required dependencies: `uv sync`
+* Run a python file: `uv run file_name`
+
 ### Sakura Notes
 
 ## Navigating
