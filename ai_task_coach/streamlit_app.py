@@ -8,6 +8,14 @@ import streamlit as st
 import streamlit.components.v1 as components
 import time
 import random
+import sys
+import os
+
+# Add the ai_task_coach directory to Python path so imports work when running directly
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from storage import Storage
 from ai_helper import AIHelper
 from session import Session
