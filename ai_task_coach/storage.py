@@ -45,6 +45,7 @@ class Storage:
     def __init__(self, filename="data/sessions.json"):
         """
         Create storage handler.
+        Saves/loads session data to/from a JSON file.
 
         :param filename: path to the JSON file
         """
@@ -53,7 +54,14 @@ class Storage:
 
 
     def _initialize(self):
-        """Create the file if it doesn't exist"""
+        """Create the data directory and file if they don't exist."""
+        import os
+
+        # Create parent directory if it doesn't exist
+        directory = os.path.dirname(self.filename)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+
         data = self._load_file()
         if data == {}:
             self._save_file({})
@@ -116,11 +124,11 @@ class Storage:
 
     def get_unfinished_session(self):
         """
-        Get all sessions that are not completed.
+        Get the first session that is not completed.
         paused: user did it
         in_progress: app closed unexpectedly
 
-        :return: list of Session objects
+        :return: Session object, or None if no unfinished session
         """
         data = self._load_file()
 
@@ -144,6 +152,22 @@ class Storage:
                 completed.append(self._dict_to_session(session_dict))
 
         return completed
+
+
+    def get_total_completed_count(self):
+        """
+        Get total number of completed sessions (all time).
+
+        :return: count of all completed sessions
+        """
+        data = self._load_file()
+        count = 0
+
+        for session_id, session_dict in data.items():
+            if session_dict["status"] == "completed":
+                count += 1
+
+        return count
 
 
     def delete_session(self, session_id):
@@ -179,8 +203,15 @@ class Storage:
             )
             tasks.append(task)
 
-        return Session(goal=session_dict["goal"], status=session_dict["status"], tasks=tasks,
-                       current_task=session_dict["current_task"])
+        return Session(
+            goal=session_dict["goal"],
+            time_available=session_dict.get("time_available", 60),
+            status=session_dict["status"],
+            tasks=tasks,
+            current_task=session_dict["current_task"],
+            session_id=session_dict["session_id"],
+            created_at=session_dict["created_at"]
+        )
 
 
 if __name__ == "__main__":

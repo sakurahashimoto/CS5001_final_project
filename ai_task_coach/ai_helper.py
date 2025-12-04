@@ -9,24 +9,55 @@ from task import Task
 
 
 class AIHelper:
-    def __init__(self):
-        """Set up connection to Gemini AI."""
-        genai.configure(api_key=GEMINI_API_KEY)
-        self.model = genai.GenerativeModel("gemini-2.0-flash")
+    def __init__(self, model=None):
+        """
+        Set up connection to Gemini AI with injectable model.
+
+        :param model: AI model instance for testing (default: Gemini)
+        """
+        if model is None:
+            genai.configure(api_key=GEMINI_API_KEY)
+            self.model = genai.GenerativeModel("gemini-2.0-flash")
+        else:
+            self.model = model
 
 
-    def break_down_goal(self, goal, adjust=None, retries=3):
+    def validate_goal(self, goal):
+        """
+        Check if the goal is meaningful and actionable.
+
+        :param goal: the user's input
+        :return: True if valid goal, False if gibberish/unclear
+        """
+        prompt = f"""
+        Is the following a clear, actionable goal or task that someone might want to accomplish?
+        
+        Input: "{goal}"
+        
+        Reply with only "YES" if it's a meaningful goal (like "write an essay", "clean my room", "study for exam").
+        Reply with only "NO" if it's gibberish, random characters, single letters, or doesn't make sense as a task.
+        """
+
+        response = self._call_ai(prompt)
+        if response and "YES" in response.upper():
+            return True
+        return False
+
+
+    def break_down_goal(self, goal, time_available, adjust=None, focus=None, retries=3):
         """
         Break down a goal (big task) into small tasks.
 
         :param goal: the big goal from user
-        :param adjust: adjustment type ("too_hard", "not_enough", "different", or None)
+        :param time_available: how many minutes user has right now
+        :param adjust: adjustment type ("too_hard", "not_enough", "different_focus", or None)
+        :param focus: specific focus area when adjust="different_focus"
         :param retries: number of attempts
         :return: list of Task objects, or None if all retries fail
         """
 
         for attempt in range(retries):
-            prompt = self._build_prompt(goal, adjust)
+            prompt = self._build_prompt(goal, time_available, adjust, focus)
             response_text = self._call_ai(prompt)
 
             if response_text is None:
@@ -42,12 +73,14 @@ class AIHelper:
         return None
 
 
-    def _build_prompt(self, goal, adjust=None):
+    def _build_prompt(self, goal, time_available, adjust=None, focus=None):
         """
         Build the prompt based on goal and adjustment.
 
         :param goal: the user's goal
-        :param adjust: adjustment type ("too_hard", "not_enough", "different", or None)
+        :param time_available: how many minutes user has right now
+        :param adjust: adjustment type ("too_hard", "not_enough", "different_focus", or None)
+        :param focus: specific focus area when adjust="different_focus"
         :return: prompt string
         """
         prompt = f"""
@@ -56,7 +89,10 @@ class AIHelper:
         The user should feel confident and pressure-free when they see your breakdown.
     
         The user has been procrastinating on this task: {goal}
-    
+        The user only has {time_available} minutes right now.
+        Make sure all tasks combined fit within {time_available} minutes.
+        Scope the goal appropriately - focus on what can realistically be accomplished in this time.
+
         Break it down into up to 5 small, actionable steps that directly accomplish the task.
         Do not provide only planning or preparation steps. Focus on the actual execution.
         
@@ -86,11 +122,11 @@ class AIHelper:
             Cover the entire task from start to finish.
             Make sure the user can actually complete the task by following all the steps.
             """
-        elif adjust == "different":
-            prompt += """
-            Instead of the standard way, suggest shortcuts, tools, or workarounds.
-            Suggest a fresh, creative way to tackle this task.
-            Start from a different angle or use a different method.
+        elif adjust == "different_focus" and focus:
+            prompt += f"""
+            Important: The user wants to focus specifically on: {focus}
+            Adjust the task breakdown to concentrate on this specific area.
+            Make sure all steps are related to this focus area.
             """
 
         return prompt
@@ -113,6 +149,11 @@ class AIHelper:
     def _parse_response(self, response_text):
         """
         Parse AI response into a list of Task objects.
+        
+        Expected AI response format:
+            1 | Open textbook | 5
+            2 | Read chapter 1 | 15
+            3 | Take notes | 10
 
         :param response_text: raw text from AI
         :return: list of Task objects, or empty list if parsing fails
@@ -121,12 +162,15 @@ class AIHelper:
         lines = response_text.strip().split("\n")
 
         for line in lines:
+            # Skip lines that don't have the pipe separator
             if "|" in line:
                 parts = line.split("|")
 
+                # Must have exactly 3 parts: number | description | minutes
                 if len(parts) != 3:
-                    return []
+                    return []  # Invalid format - retry with new AI call
 
+                # Parse task number
                 try:
                     task_number = int(parts[0].strip())
                 except ValueError:
@@ -134,8 +178,11 @@ class AIHelper:
 
                 description = parts[1].strip()
 
+                # Parse minutes (must be positive)
                 try:
                     minutes = int(parts[2].strip())
+                    if minutes <= 0:
+                        return []  # Invalid time - retry with new AI call
                 except ValueError:
                     return []
 
