@@ -5,6 +5,7 @@ Run with: streamlit run ai_task_coach/streamlit_app.py
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import time
 import random
 from storage import Storage
@@ -255,43 +256,38 @@ st.markdown("""
         }
     }
     
-    /* Green continue session button - uses marker class */
-    .continue-session-marker + div[data-testid="stButton"] button {
+    /* Unfinished Session Banner - Light green with mini Continue button */
+    .unfinished-session-btn {
         background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
         color: #3D4A2D !important;
-        box-shadow: 0 4px 18px rgba(140, 180, 100, 0.2) !important;
-        animation: bounce 2s ease-in-out infinite !important;
-        padding: 20px 24px !important;
-        padding-right: 150px !important;
+        box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
+        padding: 18px 22px !important;
+        padding-right: 120px !important;
         font-weight: 600 !important;
         border-radius: 20px !important;
         position: relative !important;
         text-align: left !important;
+        border: none !important;
     }
     
-    .continue-session-marker + div[data-testid="stButton"] button:hover {
-        animation-play-state: paused !important;
+    .unfinished-session-btn:hover {
         background: linear-gradient(135deg, #DCF0D0 0%, #CEEABE 100%) !important;
-        box-shadow: 0 6px 24px rgba(140, 180, 100, 0.3) !important;
+        box-shadow: 0 6px 20px rgba(140, 180, 100, 0.22) !important;
     }
     
-    .continue-session-marker + div[data-testid="stButton"] button::after {
+    .unfinished-session-btn::after {
         content: "Continue ▶";
         position: absolute;
-        right: 20px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.8);
-        padding: 10px 18px;
-        border-radius: 25px;
-        font-size: 0.85rem;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 8px 14px;
+        border-radius: 18px;
+        font-size: 0.78rem;
         font-weight: 600;
-        color: #5C6B3D;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-    
-    .continue-session-marker {
-        display: none;
+        color: #4A5A38;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -416,10 +412,10 @@ def render_timer(minutes, seconds, total_seconds, elapsed_seconds):
     <div class="timer-display">{minutes:02d}:{seconds:02d}</div>
     """, unsafe_allow_html=True)
     
-    # Custom HTML progress bar - warm peachy aesthetic
+    # Custom HTML progress bar - green aesthetic
     st.markdown(f"""
     <div style="width: 100%; height: 14px; background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%); border-radius: 20px; overflow: hidden; margin: 15px 0; box-shadow: 0 3px 12px rgba(180, 140, 100, 0.12);">
-        <div style="width: {percent}%; height: 100%; background: linear-gradient(90deg, #D4B896, #C9A882, #BEAA7E); border-radius: 20px; transition: width 0.3s ease;"></div>
+        <div style="width: {percent}%; height: 100%; background: linear-gradient(90deg, #A8D5BA, #95C9A8, #82BD96); border-radius: 20px; transition: width 0.3s ease;"></div>
     </div>
     <p style="text-align: center; color: #8B8078; font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 400; margin-top: 10px;">
         {percent}% complete
@@ -439,30 +435,142 @@ def page_home():
     st.markdown("### What would you like to do?")
     st.write("")
     
-    col1, col2 = st.columns(2)
+    # All buttons stacked vertically with same width
+    if st.button("🚀 Start a New Goal", use_container_width=True):
+        if unfinished:
+            st.session_state.page = "handle_existing"
+        else:
+            st.session_state.page = "new_goal"
+        st.rerun()
     
-    with col1:
-        if st.button("🚀 Start a New Goal", use_container_width=True):
-            if unfinished:
-                st.session_state.page = "handle_existing"
-            else:
-                st.session_state.page = "new_goal"
-            st.rerun()
+    st.write("")
     
-    with col2:
-        if st.button("📜 View History", use_container_width=True):
-            st.session_state.page = "history"
-            st.rerun()
+    if st.button("📜 View History", use_container_width=True):
+        st.session_state.page = "history"
+        st.rerun()
     
     if unfinished:
         st.write("")
-        st.write("")
-        # Marker for CSS targeting (hidden)
-        st.markdown('<div class="continue-session-marker"></div>', unsafe_allow_html=True)
         if st.button(f"📌 Unfinished Session: {unfinished.goal}", use_container_width=True, key="continue_unfinished"):
             st.session_state.current_session = unfinished
             st.session_state.page = "run_session"
             st.rerun()
+        
+        # Inject JavaScript to style all home page buttons
+        components.html("""
+        <script>
+            // Add bouncing animation keyframes to parent document
+            if (!parent.document.querySelector('#unfinished-btn-animation')) {
+                const style = parent.document.createElement('style');
+                style.id = 'unfinished-btn-animation';
+                style.textContent = `
+                    @keyframes gentle-bounce {
+                        0%, 100% { transform: translateY(0); }
+                        15% { transform: translateY(-6px); }
+                        30% { transform: translateY(0); }
+                        45% { transform: translateY(-4px); }
+                        60% { transform: translateY(0); }
+                    }
+                `;
+                parent.document.head.appendChild(style);
+            }
+            
+            function styleHomeButtons() {
+                const buttons = parent.document.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    const text = btn.textContent || '';
+                    
+                    // Style "Start a New Goal" button - light green
+                    if (text.includes('Start a New Goal')) {
+                        btn.style.cssText = `
+                            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
+                            color: #3D4A2D !important;
+                            box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
+                            padding: 18px 22px !important;
+                            font-weight: 600 !important;
+                            border-radius: 20px !important;
+                            border: none !important;
+                            text-align: center !important;
+                        `;
+                    }
+                    
+                    // Style "View History" button - keep cream color
+                    if (text.includes('View History')) {
+                        btn.style.cssText = `
+                            background: linear-gradient(135deg, #FFFDF5 0%, #FFF8E8 100%) !important;
+                            color: #2D2A26 !important;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(180, 160, 100, 0.1) !important;
+                            padding: 18px 22px !important;
+                            font-weight: 600 !important;
+                            border-radius: 20px !important;
+                            border: none !important;
+                            text-align: center !important;
+                        `;
+                    }
+                    
+                    // Style "Unfinished Session" button - soft light orange
+                    if (text.includes('Unfinished Session')) {
+                        btn.style.cssText = `
+                            background: linear-gradient(135deg, #FFE8D6 0%, #FFDFC4 100%) !important;
+                            color: #8B6F47 !important;
+                            box-shadow: 0 4px 15px rgba(220, 160, 120, 0.15) !important;
+                            padding: 18px 22px !important;
+                            padding-right: 120px !important;
+                            font-weight: 600 !important;
+                            border-radius: 20px !important;
+                            position: relative !important;
+                            text-align: left !important;
+                            border: none !important;
+                            animation: gentle-bounce 2s ease-in-out infinite !important;
+                        `;
+                        
+                        // Pause animation on hover and change color
+                        btn.onmouseenter = () => { 
+                            btn.style.animationPlayState = 'paused';
+                            btn.style.background = 'linear-gradient(135deg, #FFE0C8 0%, #FFD5B8 100%)';
+                            btn.style.boxShadow = '0 6px 20px rgba(220, 160, 120, 0.22)';
+                        };
+                        btn.onmouseleave = () => { 
+                            btn.style.animationPlayState = 'running';
+                            btn.style.background = 'linear-gradient(135deg, #FFE8D6 0%, #FFDFC4 100%)';
+                            btn.style.boxShadow = '0 4px 15px rgba(220, 160, 120, 0.15)';
+                        };
+                        
+                        // Add the Continue badge if not already present
+                        if (!btn.querySelector('.continue-badge')) {
+                            const badge = document.createElement('span');
+                            badge.className = 'continue-badge';
+                            badge.textContent = 'Continue ▶';
+                            badge.style.cssText = `
+                                position: absolute;
+                                right: 14px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                background: rgba(255, 255, 255, 0.75);
+                                padding: 8px 14px;
+                                border-radius: 18px;
+                                font-size: 0.78rem;
+                                font-weight: 600;
+                                color: #8B6F47;
+                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+                            `;
+                            btn.appendChild(badge);
+                        }
+                    }
+                });
+            }
+            
+            // Run multiple times to catch DOM updates
+            styleHomeButtons();
+            setTimeout(styleHomeButtons, 100);
+            setTimeout(styleHomeButtons, 300);
+            setTimeout(styleHomeButtons, 500);
+            
+            // Also observe for DOM changes
+            const observer = new MutationObserver(styleHomeButtons);
+            observer.observe(parent.document.body, {childList: true, subtree: true});
+        </script>
+        """, height=1)
 
 
 # PAGE: HANDLE EXISTING SESSION - resume or discard incomplete session
@@ -805,7 +913,7 @@ def page_run_session():
     
     # Timer controls
     if not st.session_state.timer_running:
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         
         with col1:
             if st.button("▶️ Start Timer", use_container_width=True, type="primary"):
@@ -821,15 +929,6 @@ def page_run_session():
                 session.next_task()
                 st.session_state.storage.save_session(session)
                 st.toast(get_encouragement("skipped"))
-                st.rerun()
-        
-        with col3:
-            if st.button("💾 Save & Exit", use_container_width=True):
-                session.pause()
-                st.session_state.storage.save_session(session)
-                st.session_state.current_session = None
-                st.session_state.page = "home"
-                st.toast("Session saved! See you next time!")
                 st.rerun()
     
     else:
@@ -873,7 +972,10 @@ def run_timer(task):
                         st.session_state.storage.save_session(session)
                         st.session_state.current_session = None
                         st.session_state.timer_running = False
+                        st.session_state.timer_paused = False
+                        st.session_state.timer_seconds = 0
                         st.session_state.page = "home"
+                        st.toast("Session saved! See you next time!")
                         st.rerun()
             return  # Exit the loop, wait for user interaction
         
@@ -886,12 +988,23 @@ def run_timer(task):
             render_timer(mins, secs, total_seconds, elapsed)
         
         with button_placeholder.container():
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns([1, 1, 1])
             with col1:
+                if st.button("💾 Save & Exit", use_container_width=True, key=f"save_{st.session_state.timer_seconds}"):
+                    session.pause()
+                    st.session_state.storage.save_session(session)
+                    st.session_state.current_session = None
+                    st.session_state.timer_running = False
+                    st.session_state.timer_paused = False
+                    st.session_state.timer_seconds = 0
+                    st.session_state.page = "home"
+                    st.toast("Session saved! See you next time!")
+                    st.rerun()
+            with col2:
                 if st.button("⏸️ Pause", use_container_width=True, key=f"pause_{st.session_state.timer_seconds}"):
                     st.session_state.timer_paused = True
                     st.rerun()
-            with col2:
+            with col3:
                 if st.button("✅ I'm Done", use_container_width=True, key=f"done_{st.session_state.timer_seconds}"):
                     st.session_state.timer_running = False
                     st.session_state.page = "task_complete"
