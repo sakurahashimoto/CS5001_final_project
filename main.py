@@ -1,44 +1,133 @@
-from curses.ascii import isdigit
+#Sakura Hashimoto
+from tkinter import W
+import streamlit as st
 import task_app
+import quotes
+import compliment_quotes
 
-def print_options():
-    print("1. Work on individual tasks")
-    print("2. Work on a large project")
+APP = "app"
+ADD_TASK = "add_task"
+COMPLETE_TASK = "complete_task"
+REMOVE_TASK = "remove_task"
 
+def setup():
+    if APP not in st.session_state:
+        # From the task_app module, construct a TaskApp object instance.
+        # Store the object instance in the session state dictionary inside
+        # the st module.
+        st.session_state[APP] = task_app.TaskApp("/tmp/cs5001_tasklist.json")
+
+def home_page():
+    app = st.session_state[APP]
+    st.markdown(f"# 🎁 {quotes.get_random_quote()}")
+    col1, col2 = st.columns(2)
+    with col1:
+        render_tasks()
+    with col2:
+        if st.button("Add Task", key="add_task",use_container_width=True):
+            app.page = task_app.ADD_TASK_PAGE
+            st.rerun()
+        if st.button("Complete A Task", key="complete_task",use_container_width=True):
+            app.page = task_app.COMPLETE_TASK_PAGE
+            st.rerun()
+        if st.button("Remove A Task", key="remove_task",use_container_width=True):
+            app.page = task_app.REMOVE_TASK_PAGE
+            st.rerun()
+        if st.button("View Completed Tasks", key="view_completed_tasks",use_container_width=True):
+            app.page = task_app.VIEW_COMPLETED_TASKS_PAGE
+            st.rerun()
+        if st.button("Quit", key="quit",use_container_width=True):
+            app.quit()
+        if st.button("Reset", key="reset",use_container_width=True):
+            app.full_reset() 
+            st.rerun()
+
+def add_task_callback():
+    app = st.session_state[APP]
+    task = st.session_state[ADD_TASK]
+    app.add_task(task)
+    st.session_state[ADD_TASK] = ""
+
+def render_tasks():
+    app = st.session_state[APP]
+    if len(app.data[task_app.TASK_LIST_KEY]) == 0:
+        st.markdown("## You have no tasks, enter one to get started!")
+    else:
+        st.markdown("## Tasks:")
+        for index, task in enumerate(app.data[task_app.TASK_LIST_KEY]):
+            st.markdown(f"{index + 1}. {task}")
+
+def add_task_page():
+    app = st.session_state[APP]
+    render_tasks()
+    st.text_input("Enter your task", key=ADD_TASK, on_change=add_task_callback)
+    if st.button("Back", key="add_task_back"):
+        app.page = task_app.HOME_PAGE
+        st.rerun()
+
+def complete_task_callback():
+    app = st.session_state[APP]
+    task_number = st.session_state[COMPLETE_TASK]
+    app.complete_task(task_number)
+    st.session_state[COMPLETE_TASK] = ""
+    st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉")
+
+def complete_task_page():
+    app = st.session_state[APP]
+    render_tasks()
+    st.text_input("Enter task number to mark as completed", key=COMPLETE_TASK, on_change=complete_task_callback)
+    if st.button("Back", key="complete_task_back"):
+        app.page = task_app.HOME_PAGE
+        st.rerun()
+
+def remove_task_callback():
+    app = st.session_state[APP]
+    task_number = st.session_state[REMOVE_TASK]
+    app.remove_task(task_number)
+    st.session_state[REMOVE_TASK] = ""
+
+def remove_task_page():
+    app = st.session_state[APP]
+    render_tasks()
+    st.text_input("Enter task number to remove", key=REMOVE_TASK, on_change=remove_task_callback)
+    if st.button("Back", key="remove_task_back"):
+        app.page = task_app.HOME_PAGE
+        st.rerun()
+
+def view_completed_tasks_page():
+    app = st.session_state[APP]
+    completed_tasks = app.data[task_app.COMPLETED_TASK_LIST_KEY]
+    if len(completed_tasks) == 0:
+        st.markdown("## You currently have no completed tasks")
+    else:
+        st.markdown(compliment_quotes.get_random_compliment_quote())
+        st.markdown("## Completed Tasks:")
+        for index, task in enumerate(completed_tasks):
+            st.markdown(f"{index + 1}. {task}")
+    if st.button("Back", key="view_completed_tasks_back"):
+        app.page = task_app.HOME_PAGE
+        st.rerun()
 
 def main():
-    options = """
-    What would you like to work on?
+    setup()
+    # Get the object instance from the session state dictionary
+    app = st.session_state[APP]
 
-    1. Work on invidiual tasks
-    2. Work on a large project
-
-    Please enter a number: """
-    choice_number = None
-    while True:
-        choice = input(options)
-        if choice.isdigit():
-            choice_number = int(choice)
-            if choice_number != 1 and choice_number != 2:
-                print("Please enter a valid number!")
-                continue
-            break
-
-    if choice_number == 1:
-        task_object = task_app.TaskApp("/tmp/cs5001_tasklist.json")
-        task_object.run()
-    if choice_number == 2:
-        print("Lets get to work!")
-
-
-
-  
- 
-  
+    # Check if we should display the home page
+    if app.page == task_app.HOME_PAGE:
+        home_page()
+    if app.page == task_app.ADD_TASK_PAGE:
+        add_task_page()
+    if app.page == task_app.COMPLETE_TASK_PAGE:
+        complete_task_page()
+    if app.page == task_app.REMOVE_TASK_PAGE:
+        remove_task_page()
+    if app.page == task_app.VIEW_COMPLETED_TASKS_PAGE:
+        view_completed_tasks_page()
+    
 
 if __name__ == "__main__":
     main()
-#go to task_app library and constract TaskApp using task_app library
 
 
     

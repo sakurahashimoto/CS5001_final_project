@@ -1,3 +1,4 @@
+#Sakura Hashimoto
 import pytest 
 import task_app
 import os
@@ -17,39 +18,32 @@ def test_load_data(tmp_path):
    assert task_app.TASK_LIST_KEY in app.data
    assert task_app.COMPLETED_TASK_LIST_KEY in app.data
 
-def test_add_task(tmp_path, monkeypatch):
+def test_add_task(tmp_path):
    task = "Do my homework"
-   # Patch input so that it simulates a user entering "do my homework"
-   monkeypatch.setattr("builtins.input", lambda _ : task)
 
    file_name = tmp_path.joinpath("data.json")
    app = task_app.TaskApp(file_name)
-   app.add_task()
+   app.add_task(task)
    # assert that data contains the task
    assert task in app.data[task_app.TASK_LIST_KEY]
 
-def test_remove_task(tmp_path, monkeypatch):
+def test_remove_task(tmp_path):
    task = "Do homework1"
-   # Patch input so that it simulates a user entering "do my homework"
-   monkeypatch.setattr("builtins.input", lambda _ : task)
    file_name = tmp_path.joinpath("data.json")
    app = task_app.TaskApp(file_name)
-   app.add_task()
+   app.add_task(task)
    assert task in app.data[task_app.TASK_LIST_KEY]
 
-   monkeypatch.setattr("builtins.input", lambda _ : "1")
-   app.remove_task()
+   app.remove_task("1")
    assert len(app.data[task_app.TASK_LIST_KEY]) == 0
 
-def test_completed_task(tmp_path, monkeypatch):
+def test_completed_task(tmp_path):
    task = "Eat breakfast"
-   monkeypatch.setattr("builtins.input", lambda _ : task)
    file_name = tmp_path.joinpath("data.json")
    app = task_app.TaskApp(file_name)
-   app.add_task()
+   app.add_task(task)
 
-   monkeypatch.setattr("builtins.input", lambda _ : "1")
-   app.complete_task()
+   app.complete_task("1")
    assert len(app.data[task_app.TASK_LIST_KEY]) == 0
    assert len(app.data[task_app.COMPLETED_TASK_LIST_KEY]) == 1
 

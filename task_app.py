@@ -1,4 +1,5 @@
-import sys
+#Sakura Hashimoto
+import os, signal
 import quotes
 import compliment_quotes
 import json
@@ -6,12 +7,19 @@ import json
 #type cat /tmp/cs5001_tasklist.json in terminal to see what's stored
 TASK_LIST_KEY = "tasks"
 COMPLETED_TASK_LIST_KEY = "completed_tasks"
+HOME_PAGE = "home"
+ADD_TASK_PAGE = "add_task"
+COMPLETE_TASK_PAGE = "complete_task"
+REMOVE_TASK_PAGE = "remove_task"
+VIEW_COMPLETED_TASKS_PAGE = "view_completed_tasks"
 
 class TaskApp:
     # when we construct TaskApp, file_path is parameter
     # taskapp object instance
     #__init__ constractor that returns TaskApp object
     def __init__(self, file_path):
+        # Start the page on "home"
+        self.page = HOME_PAGE
         self.file_path = file_path
         self.data = {}
         self.create_if_empty()
@@ -42,6 +50,8 @@ class TaskApp:
             except Exception as e:
                 # if we cannot load to jason we set self.data to empty lists at keys
                 self.data = {TASK_LIST_KEY: [], COMPLETED_TASK_LIST_KEY: []}
+            if len(self.data) == 0:
+                self.data = {TASK_LIST_KEY: [], COMPLETED_TASK_LIST_KEY: []}
 
     def save_data(self, file_path):
         # takes task_list that user imput then write it to the file
@@ -51,32 +61,35 @@ class TaskApp:
             print(self.data)
             json.dump(self.data, fp, indent=4)
 
-    def add_task(self):
-        ask_task = input("Enter a task: ")
+    def add_task(self, ask_task):
+        # ask_task = input("Enter a task: ")
         ask_task = ask_task.capitalize().strip()
         # append the result of ask_task into the list pointed to by the TASK_LIST_KEY
         self.data[TASK_LIST_KEY].append(ask_task)
+        self.save_data(self.file_path)
 
-    def remove_task(self):
-        if len(self.data[TASK_LIST_KEY]) == 0:
-            print("There are no tasks to remove")
-            return
-        while True:
-            self.view_tasks()
-            input_str = input("Enter the task number to remove: ")
-            if input_str.isdigit():
-                #index starts from 0 but the input starts from 1 so need to match the number
-                index = int(input_str) - 1
-                #index starting from 0 is less than or equal to lengh of lists or less than 0
-                if index >= len(self.data[TASK_LIST_KEY]) or index < 0:
-                    print("Enter a valid number please")
-                else:
-                    self.data[TASK_LIST_KEY].pop(index)
-                    print("Tasks left are: ")
-                    self.view_tasks()
-                    break
+    def remove_task(self, input_str):
+        # if len(self.data[TASK_LIST_KEY]) == 0:
+        #     print("There are no tasks to remove")
+        #     return
+        # while True:
+            # self.view_tasks()
+            # input_str = input("Enter the task number to remove: ")
+        if input_str.isdigit():
+            #index starts from 0 but the input starts from 1 so need to match the number
+            index = int(input_str) - 1
+            #index starting from 0 is less than or equal to lengh of lists or less than 0
+            if index >= len(self.data[TASK_LIST_KEY]) or index < 0:
+                return
+                # print("Enter a valid number please")
             else:
-                print("Enter a valid number please: ")
+                self.data[TASK_LIST_KEY].pop(index)
+                self.save_data(self.file_path)
+                # print("Tasks left are: ")
+                    # self.view_tasks()
+                    # break
+            # else:
+            #     print("Enter a valid number please: ")
 
     def view_tasks(self):
         #same as len(self.data[TASK_LIST_KEY]) == 0
@@ -87,25 +100,26 @@ class TaskApp:
         for index, task in enumerate(self.data[TASK_LIST_KEY]):
             print(f"{index + 1}. {task}")
 
-    def complete_task(self):
-        if len(self.data[TASK_LIST_KEY]) == 0:
-            print("You have no tasks")
-            return
-        #otherwise
-        while True:
-            self.view_tasks()
-            ask_if_completed_str = input("Enter the task number completed: ")
-            if ask_if_completed_str.isdigit():
-                index = int(ask_if_completed_str) - 1
-                if index >= len(self.data[TASK_LIST_KEY]) or index < 0:
-                    print("Enter a valid number please")
-                else:
-                    completed_task = self.data[TASK_LIST_KEY].pop(index)
-                    self.data[COMPLETED_TASK_LIST_KEY].append(completed_task)
-                    print("Task left is: ")
-                    self.view_tasks()
-                    self.view_completed_task_list()
-                    break
+    def complete_task(self, ask_if_completed_str):
+        # if len(self.data[TASK_LIST_KEY]) == 0:
+        #     print("You have no tasks")
+        #     return
+        # #otherwise
+        # while True:
+            # self.view_tasks()
+            # ask_if_completed_str = input("Enter the task number completed: ")
+        if ask_if_completed_str.isdigit():
+            index = int(ask_if_completed_str) - 1
+            if index >= len(self.data[TASK_LIST_KEY]) or index < 0:
+                return
+                # print("Enter a valid number please")
+            else:
+                completed_task = self.data[TASK_LIST_KEY].pop(index)
+                self.data[COMPLETED_TASK_LIST_KEY].append(completed_task)
+                self.save_data(self.file_path)
+                # print("Task left is: ")
+                # self.view_tasks()
+                # self.view_completed_task_list()
 
     def view_completed_task_list(self):
         if not self.data[COMPLETED_TASK_LIST_KEY]:
@@ -118,17 +132,15 @@ class TaskApp:
             compliment_quotes.get_random_compliment_quote()
 
     def quit(self):
-        self.save_data(
-            self.file_path,
-        )
-        print("Good work today!")
-        print("See you soon!")
-        sys.exit(1)
+        os.kill(os.getpid(), signal.SIGKILL)
 
     def full_reset(self):
         # call function save_list that takes TASK_LIST_FILE, and give empty list so reset
         self.data = {}
         self.save_data(self.file_path)
+        self.data[TASK_LIST_KEY] = []
+        self.data[COMPLETED_TASK_LIST_KEY] = []
+
 
     def run(self):
         # load TASK_LIST_FILE and assign it to the task_list
@@ -192,11 +204,7 @@ class TaskApp:
             elif user_answer == "6":
                 self.quit()
             elif user_answer == "7":
-                # clear the file
                 self.full_reset()
-                # clear the local state
-                self.data[TASK_LIST_KEY] = []
-                self.data[COMPLETED_TASK_LIST_KEY] = []
 
             else:
                 print("Invalid input! Please enter a number from the menu.")
