@@ -24,4 +24,4 @@ COMPLIMENT = [
 ]
 
 def get_random_compliment_quote():
-    print(random.choice(COMPLIMENT))
+    return random.choice(COMPLIMENT)

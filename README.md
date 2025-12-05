@@ -14,6 +14,9 @@ To get started:
 * Fetch all required dependencies: `uv sync`
 * Run a python file: `uv run file_name`
 
+To run the app:
+* `uv run streamlit run main.py`
+
 ### Sakura Notes
 
 ## Navigating
