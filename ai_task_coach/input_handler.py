@@ -1,4 +1,5 @@
 """
+Hyunjoo Shim (NUID: 002505607)
 input_handler.py
 Handles all user input - getting goals, times, menu choices, etc.
 Also validates input using AI when needed (e.g., checking if goal makes sense).
