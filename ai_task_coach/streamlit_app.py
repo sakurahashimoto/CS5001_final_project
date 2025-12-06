@@ -1,11 +1,11 @@
 """
+Hyunjoo Shim (NUID: 002505607)
 streamlit_app.py
 Streamlit web UI for the Task Coach app.
 Run with: streamlit run ai_task_coach/streamlit_app.py
 """
 
 import streamlit as st
-import streamlit.components.v1 as components
 import time
 import random
 import sys
@@ -354,9 +354,6 @@ def get_encouragement(status):
     return random.choice(messages)
 
 
-def show_confetti():
-    """Show confetti/celebration animation."""
-    st.balloons()
 
 
 # UI COMPONENTS - reusable render functions
@@ -463,122 +460,6 @@ def page_home():
             st.session_state.current_session = unfinished
             st.session_state.page = "run_session"
             st.rerun()
-        
-        # Inject JavaScript to style all home page buttons
-        components.html("""
-        <script>
-            // Add bouncing animation keyframes to parent document
-            if (!parent.document.querySelector('#unfinished-btn-animation')) {
-                const style = parent.document.createElement('style');
-                style.id = 'unfinished-btn-animation';
-                style.textContent = `
-                    @keyframes gentle-bounce {
-                        0%, 100% { transform: translateY(0); }
-                        15% { transform: translateY(-6px); }
-                        30% { transform: translateY(0); }
-                        45% { transform: translateY(-4px); }
-                        60% { transform: translateY(0); }
-                    }
-                `;
-                parent.document.head.appendChild(style);
-            }
-            
-            function styleHomeButtons() {
-                const buttons = parent.document.querySelectorAll('button');
-                buttons.forEach(btn => {
-                    const text = btn.textContent || '';
-                    
-                    // Style "Start a New Goal" button - light green
-                    if (text.includes('Start a New Goal')) {
-                        btn.style.cssText = `
-                            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
-                            color: #3D4A2D !important;
-                            box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
-                            padding: 18px 22px !important;
-                            font-weight: 600 !important;
-                            border-radius: 20px !important;
-                            border: none !important;
-                            text-align: center !important;
-                        `;
-                    }
-                    
-                    // Style "View History" button - keep cream color
-                    if (text.includes('View History')) {
-                        btn.style.cssText = `
-                            background: linear-gradient(135deg, #FFFDF5 0%, #FFF8E8 100%) !important;
-                            color: #2D2A26 !important;
-                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(180, 160, 100, 0.1) !important;
-                            padding: 18px 22px !important;
-                            font-weight: 600 !important;
-                            border-radius: 20px !important;
-                            border: none !important;
-                            text-align: center !important;
-                        `;
-                    }
-                    
-                    // Style "Unfinished Session" button - soft light orange
-                    if (text.includes('Unfinished Session')) {
-                        btn.style.cssText = `
-                            background: linear-gradient(135deg, #FFE8D6 0%, #FFDFC4 100%) !important;
-                            color: #8B6F47 !important;
-                            box-shadow: 0 4px 15px rgba(220, 160, 120, 0.15) !important;
-                            padding: 18px 22px !important;
-                            padding-right: 120px !important;
-                            font-weight: 600 !important;
-                            border-radius: 20px !important;
-                            position: relative !important;
-                            text-align: left !important;
-                            border: none !important;
-                            animation: gentle-bounce 2s ease-in-out infinite !important;
-                        `;
-                        
-                        // Pause animation on hover and change color
-                        btn.onmouseenter = () => { 
-                            btn.style.animationPlayState = 'paused';
-                            btn.style.background = 'linear-gradient(135deg, #FFE0C8 0%, #FFD5B8 100%)';
-                            btn.style.boxShadow = '0 6px 20px rgba(220, 160, 120, 0.22)';
-                        };
-                        btn.onmouseleave = () => { 
-                            btn.style.animationPlayState = 'running';
-                            btn.style.background = 'linear-gradient(135deg, #FFE8D6 0%, #FFDFC4 100%)';
-                            btn.style.boxShadow = '0 4px 15px rgba(220, 160, 120, 0.15)';
-                        };
-                        
-                        // Add the Continue badge if not already present
-                        if (!btn.querySelector('.continue-badge')) {
-                            const badge = document.createElement('span');
-                            badge.className = 'continue-badge';
-                            badge.textContent = 'Continue ▶';
-                            badge.style.cssText = `
-                                position: absolute;
-                                right: 14px;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                background: rgba(255, 255, 255, 0.75);
-                                padding: 8px 14px;
-                                border-radius: 18px;
-                                font-size: 0.78rem;
-                                font-weight: 600;
-                                color: #8B6F47;
-                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-                            `;
-                            btn.appendChild(badge);
-                        }
-                    }
-                });
-            }
-            
-            // Run multiple times to catch DOM updates
-            styleHomeButtons();
-            setTimeout(styleHomeButtons, 100);
-            setTimeout(styleHomeButtons, 300);
-            setTimeout(styleHomeButtons, 500);
-            
-            // Also observe for DOM changes
-            const observer = new MutationObserver(styleHomeButtons);
-            observer.observe(parent.document.body, {childList: true, subtree: true});
-        </script>
-        """, height=1)
 
 
 # PAGE: HANDLE EXISTING SESSION - resume or discard incomplete session
@@ -620,7 +501,7 @@ def page_new_goal():
     st.markdown("### 🎯 What do you want to accomplish?")
     st.write("")
     
-    st.caption("💡 Tip: Be specific! e.g., 'Study chapter 3 of discrete math' instead of 'study math'")
+    st.caption("💡 Tip: Be specific! e.g., 'Study Big-O Notation of discrete math' instead of 'study math'")
     
     goal = st.text_input("Your goal:", placeholder="Enter your goal here...")
     
@@ -804,8 +685,6 @@ def page_adjust_time():
         if st.button("💾 Save Changes", use_container_width=True, type="primary"):
             task.update_time(new_time)
             st.session_state.storage.save_session(session)
-            st.success(f"Updated to {new_time} minutes!")
-            time.sleep(1)
             st.session_state.page = "confirm_tasks"
             st.rerun()
 
@@ -906,16 +785,8 @@ def page_run_session():
     st.markdown("---")
     st.write("")
     
-    # Show all tasks with current highlighted
-    for t in session.tasks:
-        is_current = (t.task_number == task.task_number)
-        render_task_card(t, is_current=is_current)
-    
-    st.write("")
-    st.markdown("---")
-    
-    # Current task details
-    st.markdown(f"### ▶️ Current Task: {task.description}")
+    # Show only current task - clean, focused view
+    st.markdown(f"### ▶️ Task {task.task_number} of {total_tasks}: {task.description}")
     st.markdown(f"**Time: {task.timer_minutes} minutes**")
     st.write("")
     
@@ -933,7 +804,6 @@ def page_run_session():
         with col2:
             if st.button("⏭️ Skip Task", use_container_width=True):
                 task.skip()
-                st.session_state.storage.save_session(session)
                 session.next_task()
                 st.session_state.storage.save_session(session)
                 st.toast(get_encouragement("skipped"))
@@ -1079,7 +949,6 @@ def page_task_complete():
     with col1:
         if st.button("✅ Done!", use_container_width=True, type="primary"):
             task.complete()
-            st.session_state.storage.save_session(session)
             session.next_task()
             st.session_state.storage.save_session(session)
             st.toast(get_encouragement("completed"))
@@ -1094,7 +963,6 @@ def page_task_complete():
     with col3:
         if st.button("⏭️ Skip", use_container_width=True):
             task.skip()
-            st.session_state.storage.save_session(session)
             session.next_task()
             st.session_state.storage.save_session(session)
             st.toast(get_encouragement("skipped"))
@@ -1129,10 +997,12 @@ def page_extend_time():
             st.session_state.timer_seconds = extra_minutes * 60
             st.session_state.timer_running = True
             st.session_state.timer_paused = False
-            # Update task timer for display purposes
-            task = st.session_state.current_session.get_current_task()
+            # Update task timer to track total allocated time (persistent data)
+            session = st.session_state.current_session
+            task = session.get_current_task()
             if task:
-                task.timer_minutes = extra_minutes
+                task.timer_minutes += extra_minutes
+                st.session_state.storage.save_session(session)
             st.session_state.page = "run_session"
             st.rerun()
 
@@ -1187,7 +1057,7 @@ def complete_session():
     st.session_state.storage.save_session(session)
     
     # Show confetti celebration
-    show_confetti()
+    st.balloons()
     
     st.markdown("""
     <div class="celebration">

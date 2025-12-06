@@ -1,4 +1,5 @@
 """
+Hyunjoo Shim (NUID: 002505607)
 config.py
 Central place for all settings (like API keys).
 Other files import from here.

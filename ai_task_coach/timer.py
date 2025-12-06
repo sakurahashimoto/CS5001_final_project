@@ -1,4 +1,5 @@
 """
+Hyunjoo Shim (NUID: 002505607)
 timer.py
 Countdown timer for each task.
 """
