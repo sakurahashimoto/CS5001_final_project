@@ -503,6 +503,10 @@ def page_home():
             st.session_state.current_session = unfinished
             st.session_state.page = "run_session"
             st.rerun()
+    
+    if st.button("Main Menu", use_container_width=True):
+        st.session_state.page = "full_home"
+        st.rerun()
 
 
 # PAGE: HANDLE EXISTING SESSION - resume or discard incomplete session

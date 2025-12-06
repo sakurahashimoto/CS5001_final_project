@@ -1,3 +1,4 @@
+#Sakura Hashimoto
 import random
 
 MOTIVATIONAL_QUOTES = [
