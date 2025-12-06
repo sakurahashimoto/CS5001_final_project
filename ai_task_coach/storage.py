@@ -111,14 +111,15 @@ class Storage:
         Find a specific session by ID.
 
         :param session_id: the ID to search for
-        :return: Session object, or None if not found
+        :return: Session object, or None if not found or invalid
         """
         data = self._load_file()
 
         session_id_str = str(session_id)                # Convert to string in case UUID is passed
 
         if session_id_str in data:
-            return self._dict_to_session(data[session_id_str])
+            session = self._dict_to_session(data[session_id_str])
+            return session  # May be None if data is invalid
 
         return None
 
@@ -134,8 +135,10 @@ class Storage:
         data = self._load_file()
 
         for session_id, session_dict in data.items():
-            if session_dict["status"] in ["paused", "in_progress"]:
-                return self._dict_to_session(session_dict)
+            if session_dict.get("status") in ["paused", "in_progress"]:
+                session = self._dict_to_session(session_dict)
+                if session:  # Skip if None (invalid data)
+                    return session
 
         return None
 
@@ -149,8 +152,10 @@ class Storage:
         completed = []
 
         for session_id, session_dict in data.items():
-            if session_dict["status"] == "completed":
-                completed.append(self._dict_to_session(session_dict))
+            if session_dict.get("status") == "completed":
+                session = self._dict_to_session(session_dict)
+                if session:  # Skip if None (invalid data)
+                    completed.append(session)
 
         return completed
 
@@ -165,7 +170,7 @@ class Storage:
         count = 0
 
         for session_id, session_dict in data.items():
-            if session_dict["status"] == "completed":
+            if session_dict.get("status") == "completed":
                 count += 1
 
         return count
@@ -192,27 +197,31 @@ class Storage:
         Convert dictionary to Session object.
 
         :param session_dict: dictionary from JSON
-        :return: Session object
+        :return: Session object, or None if data is invalid
         """
-        tasks = []
-        for task_dict in session_dict["tasks"]:
-            task = Task(
-                task_number=task_dict["task_number"],
-                description=task_dict["description"],
-                timer_minutes=task_dict["timer_minutes"],
-                status=task_dict["status"]
-            )
-            tasks.append(task)
+        try:
+            tasks = []
+            for task_dict in session_dict.get("tasks", []):
+                task = Task(
+                    task_number=task_dict.get("task_number", 0),
+                    description=task_dict.get("description", ""),
+                    timer_minutes=task_dict.get("timer_minutes", 5),
+                    status=task_dict.get("status", "pending")
+                )
+                tasks.append(task)
 
-        return Session(
-            goal=session_dict["goal"],
-            time_available=session_dict.get("time_available", 60),
-            status=session_dict["status"],
-            tasks=tasks,
-            current_task=session_dict["current_task"],
-            session_id=session_dict["session_id"],
-            created_at=session_dict["created_at"]
-        )
+            return Session(
+                goal=session_dict.get("goal", "Unknown"),
+                time_available=session_dict.get("time_available", 60),
+                status=session_dict.get("status", "in_progress"),
+                tasks=tasks,
+                current_task=session_dict.get("current_task", 0),
+                session_id=session_dict.get("session_id"),
+                created_at=session_dict.get("created_at")
+            )
+        except (KeyError, TypeError, ValueError) as e:
+            # Invalid data - return None to skip this session
+            return None
 
 
 if __name__ == "__main__":

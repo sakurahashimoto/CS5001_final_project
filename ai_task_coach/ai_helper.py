@@ -17,6 +17,8 @@ class AIHelper:
         :param model: AI model instance for testing (default: Gemini)
         """
         if model is None:
+            if not GEMINI_API_KEY:
+                raise ValueError("GEMINI_API_KEY is required. Please set it in .env file.")
             genai.configure(api_key=GEMINI_API_KEY)
             self.model = genai.GenerativeModel("gemini-2.0-flash")
         else:

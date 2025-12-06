@@ -1,3 +1,13 @@
+ai_task_coach/.env
+__pycache__/
+.venv/
+data/
+.idea/
+.vscode/
+.DS_Store
+*.DS_Store
+assets/
+
 # From https://github.com/github/gitignore/blob/main/Python.gitignore
 
 # Byte-compiled / optimized / DLL files
