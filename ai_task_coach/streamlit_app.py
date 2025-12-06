@@ -31,274 +31,275 @@ st.set_page_config(
 )
 
 # Custom CSS - Soft UI design with subtle gradients
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
-    
-    /* BACKGROUND - clean white */
-    .stApp {
-        background: #FFFFFF;
-        background-attachment: fixed;
-        min-height: 100vh;
-    }
-    
-    /* TYPOGRAPHY */
-    h1, h2, h3 {
-        font-family: 'DM Sans', sans-serif !important;
-        font-weight: 700 !important;
-        color: #2D2A26 !important;
-    }
-    
-    p, li, label, .stMarkdown, span {
-        font-family: 'DM Sans', sans-serif !important;
-        color: #4A4540 !important;
-    }
-    
-    /* TASK CARDS - soft cream with diffused shadows */
-    .task-card {
-        background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
-        border-radius: 24px;
-        padding: 22px 26px;
-        margin: 14px 0;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 24px rgba(180, 140, 100, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .task-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 36px rgba(180, 140, 100, 0.14);
-    }
-    
-    .task-card-completed {
-        background: linear-gradient(135deg, #E8EFD5 0%, #E0E8CB 100%);
-    }
-    
-    .task-card-skipped {
-        background: linear-gradient(135deg, #FFF5EE 0%, #FFE8D9 100%);
-        opacity: 0.85;
-    }
-    
-    .task-card-current {
-        background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
-        box-shadow: 0 6px 25px rgba(180, 140, 100, 0.2);
-        border: 2px solid rgba(200, 160, 100, 0.2);
-    }
-    
-    /* TIMER DISPLAY */
-    .timer-display {
-        font-family: 'DM Mono', monospace !important;
-        font-size: 4.5rem !important;
-        font-weight: 500;
-        text-align: center;
-        color: #2D2A26;
-        margin: 30px 0;
-        letter-spacing: -2px;
-    }
-    
-    /* SOFT UI BUTTONS - soft light yellow/cream */
-    .stButton > button {
-        font-family: 'DM Sans', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        border-radius: 50px !important;
-        padding: 0.75rem 1.8rem !important;
-        transition: all 0.3s ease !important;
-        background: linear-gradient(135deg, #FFFDF5 0%, #FFF8E8 100%) !important;
-        color: #2D2A26 !important;
-        border: none !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(180, 160, 100, 0.1) !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 10px 30px rgba(180, 160, 100, 0.14) !important;
-        background: linear-gradient(135deg, #FFFBE8 0%, #FFF5DC 100%) !important;
-    }
-    
-    /* Primary buttons - Softer light sage green */
-    .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #E2ECC8 0%, #D8E5BC 100%) !important;
-        color: #4A5540 !important;
-        border: none !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(165, 185, 120, 0.2) !important;
-    }
-    
-    .stButton > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #DAE6BC 0%, #D0DEB0 100%) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 10px 30px rgba(165, 185, 120, 0.28) !important;
-    }
-    
-    /* PROGRESS BAR */
-    .stProgress > div {
-        height: 10px !important;
-        background-color: rgba(255, 255, 255, 0.6) !important;
-        border-radius: 10px !important;
-    }
-    
-    .stProgress > div > div {
-        height: 10px !important;
-        background-color: rgba(255, 255, 255, 0.6) !important;
-        border-radius: 10px !important;
-    }
-    
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #D4B896, #E8CBA8) !important;
-        border-radius: 10px !important;
-        height: 10px !important;
-    }
-    
-    /* CELEBRATION */
-    .celebration {
-        text-align: center;
-        padding: 50px;
-        background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
-        border-radius: 32px;
-        margin: 25px 0;
-        border: none;
-        box-shadow: 0 8px 35px rgba(180, 140, 100, 0.15);
-    }
-    
-    /* HIDE STREAMLIT BRANDING */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    
-    /* INPUT STYLING */
-    .stTextInput > div > div > input {
-        font-family: 'DM Sans', sans-serif !important;
-        background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
-        border: none;
-        border-radius: 16px;
-        color: #2D2A26 !important;
-        padding: 14px 18px !important;
-        box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        box-shadow: 0 4px 18px rgba(180, 140, 100, 0.18);
-    }
-    
-    .stNumberInput > div > div > input {
-        font-family: 'DM Mono', monospace !important;
-        background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
-        border: none;
-        border-radius: 16px;
-        color: #2D2A26 !important;
-        box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
-    }
-    
-    /* SELECT BOX */
-    .stSelectbox > div > div {
-        background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
-    }
-    
-    /* ALERTS/INFO BOXES - light green gradient */
-    .stAlert {
-        background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
-        border-radius: 20px !important;
-        border: none !important;
-        box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
-    }
-    
-    .stAlert > div {
-        background: transparent !important;
-        border: none !important;
-    }
-    
-    .stAlert p, .stAlert span {
-        color: #3D4A2D !important;
-    }
-    
-    /* METRICS */
-    [data-testid="stMetricValue"] {
-        font-family: 'DM Mono', monospace !important;
-        color: #2D2A26 !important;
-    }
-    
-    /* TIME BADGE IN CARDS - soft yellow-green */
-    .time-badge {
-        color: #5C6B3D;
-        font-family: 'DM Mono', monospace;
-        font-weight: 500;
-        background: linear-gradient(135deg, #E8EFD5 0%, #DDE6C8 100%);
-        padding: 8px 16px;
-        border-radius: 20px;
-        white-space: nowrap;
-        font-size: 0.85rem;
-    }
-    
-    /* ABSTRACT DECORATIVE SHAPES */
-    .abstract-shape {
-        position: absolute;
-        pointer-events: none;
-        z-index: 0;
-    }
-    
-    /* BOUNCING ANIMATION for Continue Session button */
-    @keyframes bounce {
-        0%, 100% {
-            transform: translateY(0);
+def set_style():
+    st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+        
+        /* BACKGROUND - clean white */
+        .stApp {
+            background: #FFFFFF;
+            background-attachment: fixed;
+            min-height: 100vh;
         }
-        15% {
-            transform: translateY(-8px);
+        
+        /* TYPOGRAPHY */
+        h1, h2, h3 {
+            font-family: 'DM Sans', sans-serif !important;
+            font-weight: 700 !important;
+            color: #2D2A26 !important;
         }
-        30% {
-            transform: translateY(0);
+        
+        p, li, label, .stMarkdown, span {
+            font-family: 'DM Sans', sans-serif !important;
+            color: #4A4540 !important;
         }
-        45% {
-            transform: translateY(-5px);
+        
+        /* TASK CARDS - soft cream with diffused shadows */
+        .task-card {
+            background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
+            border-radius: 24px;
+            padding: 22px 26px;
+            margin: 14px 0;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 24px rgba(180, 140, 100, 0.1);
+            transition: all 0.3s ease;
         }
-        60% {
-            transform: translateY(0);
+        
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 36px rgba(180, 140, 100, 0.14);
         }
-        75% {
-            transform: translateY(-2px);
+        
+        .task-card-completed {
+            background: linear-gradient(135deg, #E8EFD5 0%, #E0E8CB 100%);
         }
-        90% {
-            transform: translateY(0);
+        
+        .task-card-skipped {
+            background: linear-gradient(135deg, #FFF5EE 0%, #FFE8D9 100%);
+            opacity: 0.85;
         }
-    }
-    
-    /* Unfinished Session Banner - Light green with mini Continue button */
-    .unfinished-session-btn {
-        background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
-        color: #3D4A2D !important;
-        box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
-        padding: 18px 22px !important;
-        padding-right: 120px !important;
-        font-weight: 600 !important;
-        border-radius: 20px !important;
-        position: relative !important;
-        text-align: left !important;
-        border: none !important;
-    }
-    
-    .unfinished-session-btn:hover {
-        background: linear-gradient(135deg, #DCF0D0 0%, #CEEABE 100%) !important;
-        box-shadow: 0 6px 20px rgba(140, 180, 100, 0.22) !important;
-    }
-    
-    .unfinished-session-btn::after {
-        content: "Continue ▶";
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.75);
-        padding: 8px 14px;
-        border-radius: 18px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #4A5A38;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    }
-</style>
-""", unsafe_allow_html=True)
+        
+        .task-card-current {
+            background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
+            box-shadow: 0 6px 25px rgba(180, 140, 100, 0.2);
+            border: 2px solid rgba(200, 160, 100, 0.2);
+        }
+        
+        /* TIMER DISPLAY */
+        .timer-display {
+            font-family: 'DM Mono', monospace !important;
+            font-size: 4.5rem !important;
+            font-weight: 500;
+            text-align: center;
+            color: #2D2A26;
+            margin: 30px 0;
+            letter-spacing: -2px;
+        }
+        
+        /* SOFT UI BUTTONS - soft light yellow/cream */
+        .stButton > button {
+            font-family: 'DM Sans', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            border-radius: 50px !important;
+            padding: 0.75rem 1.8rem !important;
+            transition: all 0.3s ease !important;
+            background: linear-gradient(135deg, #FFFDF5 0%, #FFF8E8 100%) !important;
+            color: #2D2A26 !important;
+            border: none !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(180, 160, 100, 0.1) !important;
+        }
+        
+        .stButton > button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 10px 30px rgba(180, 160, 100, 0.14) !important;
+            background: linear-gradient(135deg, #FFFBE8 0%, #FFF5DC 100%) !important;
+        }
+        
+        /* Primary buttons - Softer light sage green */
+        .stButton > button[kind="primary"] {
+            background: linear-gradient(135deg, #E2ECC8 0%, #D8E5BC 100%) !important;
+            color: #4A5540 !important;
+            border: none !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(165, 185, 120, 0.2) !important;
+        }
+        
+        .stButton > button[kind="primary"]:hover {
+            background: linear-gradient(135deg, #DAE6BC 0%, #D0DEB0 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 10px 30px rgba(165, 185, 120, 0.28) !important;
+        }
+        
+        /* PROGRESS BAR */
+        .stProgress > div {
+            height: 10px !important;
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            border-radius: 10px !important;
+        }
+        
+        .stProgress > div > div {
+            height: 10px !important;
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            border-radius: 10px !important;
+        }
+        
+        .stProgress > div > div > div {
+            background: linear-gradient(90deg, #D4B896, #E8CBA8) !important;
+            border-radius: 10px !important;
+            height: 10px !important;
+        }
+        
+        /* CELEBRATION */
+        .celebration {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
+            border-radius: 32px;
+            margin: 25px 0;
+            border: none;
+            box-shadow: 0 8px 35px rgba(180, 140, 100, 0.15);
+        }
+        
+        /* HIDE STREAMLIT BRANDING */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        
+        /* INPUT STYLING */
+        .stTextInput > div > div > input {
+            font-family: 'DM Sans', sans-serif !important;
+            background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
+            border: none;
+            border-radius: 16px;
+            color: #2D2A26 !important;
+            padding: 14px 18px !important;
+            box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stTextInput > div > div > input:focus {
+            box-shadow: 0 4px 18px rgba(180, 140, 100, 0.18);
+        }
+        
+        .stNumberInput > div > div > input {
+            font-family: 'DM Mono', monospace !important;
+            background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
+            border: none;
+            border-radius: 16px;
+            color: #2D2A26 !important;
+            box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
+        }
+        
+        /* SELECT BOX */
+        .stSelectbox > div > div {
+            background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
+        }
+        
+        /* ALERTS/INFO BOXES - light green gradient */
+        .stAlert {
+            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
+            border-radius: 20px !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
+        }
+        
+        .stAlert > div {
+            background: transparent !important;
+            border: none !important;
+        }
+        
+        .stAlert p, .stAlert span {
+            color: #3D4A2D !important;
+        }
+        
+        /* METRICS */
+        [data-testid="stMetricValue"] {
+            font-family: 'DM Mono', monospace !important;
+            color: #2D2A26 !important;
+        }
+        
+        /* TIME BADGE IN CARDS - soft yellow-green */
+        .time-badge {
+            color: #5C6B3D;
+            font-family: 'DM Mono', monospace;
+            font-weight: 500;
+            background: linear-gradient(135deg, #E8EFD5 0%, #DDE6C8 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-size: 0.85rem;
+        }
+        
+        /* ABSTRACT DECORATIVE SHAPES */
+        .abstract-shape {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* BOUNCING ANIMATION for Continue Session button */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            15% {
+                transform: translateY(-8px);
+            }
+            30% {
+                transform: translateY(0);
+            }
+            45% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(0);
+            }
+            75% {
+                transform: translateY(-2px);
+            }
+            90% {
+                transform: translateY(0);
+            }
+        }
+        
+        /* Unfinished Session Banner - Light green with mini Continue button */
+        .unfinished-session-btn {
+            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
+            color: #3D4A2D !important;
+            box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
+            padding: 18px 22px !important;
+            padding-right: 120px !important;
+            font-weight: 600 !important;
+            border-radius: 20px !important;
+            position: relative !important;
+            text-align: left !important;
+            border: none !important;
+        }
+        
+        .unfinished-session-btn:hover {
+            background: linear-gradient(135deg, #DCF0D0 0%, #CEEABE 100%) !important;
+            box-shadow: 0 6px 20px rgba(140, 180, 100, 0.22) !important;
+        }
+        
+        .unfinished-session-btn::after {
+            content: "Continue ▶";
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.75);
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #4A5A38;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 
 # INITIALIZE SESSION STATE & SERVICES
