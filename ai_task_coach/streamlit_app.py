@@ -365,24 +365,67 @@ def render_task_card(task, is_current=False):
         accent_color = "rgba(180, 200, 140, 0.6)"
         title_color = "#5C6B3D"
         bg_style = "background: linear-gradient(135deg, #F0F5E5 0%, #E8EFD8 100%);"
+        border_style = ""
+        shadow_style = "0 4px 18px rgba(180, 140, 100, 0.1)"
+        animation_style = ""
     elif task.status == "skipped":
         accent_color = "rgba(220, 190, 160, 0.5)"
         title_color = "#9A8570"
         bg_style = "background: linear-gradient(135deg, #FFF8F0 0%, #FFEFE0 100%); opacity: 0.8;"
+        border_style = ""
+        shadow_style = "0 4px 18px rgba(180, 140, 100, 0.1)"
+        animation_style = ""
     elif is_current:
-        accent_color = "rgba(220, 210, 140, 0.6)"
+        # Current task - make it highly visible with animation
+        accent_color = "rgba(255, 200, 100, 0.8)"
         title_color = "#2D2A26"
-        bg_style = "background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);"
+        bg_style = "background: linear-gradient(135deg, #FFF9E6 0%, #FFEECC 100%);"
+        border_style = "border: 3px solid rgba(240, 200, 150, 0.4);"
+        shadow_style = "0 8px 32px rgba(240, 200, 150, 0.2), 0 4px 16px rgba(255, 220, 160, 0.15);"
+        animation_style = """
+            animation: pulse-glow 2s ease-in-out infinite, subtle-scale 3s ease-in-out infinite;
+        """
     else:
         accent_color = "rgba(230, 220, 200, 0.4)"
         title_color = "#6B635A"
         bg_style = "background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%);"
+        border_style = ""
+        shadow_style = "0 4px 18px rgba(180, 140, 100, 0.1)"
+        animation_style = ""
     
+    # Add CSS animations for current task
+    css_animations = """
+    <style>
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(240, 200, 150, 0.2), 0 4px 16px rgba(255, 220, 160, 0.15);
+                border-color: rgba(240, 200, 150, 0.4);
+            }
+            50% {
+                box-shadow: 0 12px 40px rgba(240, 200, 150, 0.3), 0 6px 20px rgba(255, 220, 160, 0.25);
+                border-color: rgba(240, 200, 150, 0.6);
+            }
+        }
+        @keyframes subtle-scale {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+    </style>
+    """ if is_current else ""
+    
+    padding = "24px 26px" if is_current else "20px 22px"
+    margin = "16px 0" if is_current else "12px 0"
+    
+    st.markdown(css_animations, unsafe_allow_html=True)
     st.markdown(f"""
-    <div style="position: relative; {bg_style} border-radius: 20px; padding: 20px 22px; margin: 12px 0; box-shadow: 0 4px 18px rgba(180, 140, 100, 0.1); overflow: hidden;">
+    <div style="position: relative; {bg_style} {border_style} border-radius: 20px; padding: {padding}; margin: {margin}; box-shadow: {shadow_style}; overflow: hidden; {animation_style}">
         <div style="position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: radial-gradient(circle, {accent_color} 0%, transparent 70%); border-radius: 50%;"></div>
         <div style="position: relative; z-index: 1;">
-            <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: {title_color}; font-family: 'DM Sans', sans-serif;">Task {task.task_number}</h4>
+            <h4 style="margin: 0 0 8px 0; font-size: {'1.2rem' if is_current else '1.1rem'}; font-weight: {'700' if is_current else '600'}; color: {title_color}; font-family: 'DM Sans', sans-serif;">Task {task.task_number}{' ⭐' if is_current else ''}</h4>
             <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: #7A7268; line-height: 1.5; font-family: 'DM Sans', sans-serif;">{task.description}</p>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="width: 28px; height: 28px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #6B635A; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">▶</span>
@@ -632,6 +675,10 @@ def regenerate_tasks(adjust_type, focus=None):
     """Regenerate tasks with adjustment."""
     session = st.session_state.current_session
     
+    if not session:
+        st.error("No session found.")
+        return
+    
     with st.spinner("Regenerating tasks... 🔄"):
         tasks = st.session_state.ai.break_down_goal(
             session.goal,
@@ -654,6 +701,13 @@ def regenerate_tasks(adjust_type, focus=None):
 def page_adjust_time():
     """Let user adjust time for a specific task."""
     session = st.session_state.current_session
+    
+    if not session or not session.tasks:
+        st.error("No tasks available to adjust.")
+        if st.button("← Back"):
+            st.session_state.page = "confirm_tasks"
+            st.rerun()
+        return
     
     st.markdown("### ⏱️ Adjust Task Time")
     st.write("")
@@ -694,6 +748,11 @@ def page_adjust_time():
 def page_different_focus():
     """Let user specify different focus area."""
     session = st.session_state.current_session
+    
+    if not session:
+        st.session_state.page = "home"
+        st.rerun()
+        return
     
     st.markdown("### 🔍 What topic would you like to focus on?")
     st.write("")
@@ -785,32 +844,54 @@ def page_run_session():
     st.markdown("---")
     st.write("")
     
-    # Show only current task - clean, focused view
-    st.markdown(f"### ▶️ Task {task.task_number} of {total_tasks}: {task.description}")
-    st.markdown(f"**Time: {task.timer_minutes} minutes**")
-    st.write("")
+    # Use empty placeholder to ensure task list is completely cleared when timer runs
+    task_list_placeholder = st.empty()
     
-    # Timer controls
+    # Show task list and current task details only when timer is NOT running
     if not st.session_state.timer_running:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.button("▶️ Start Timer", use_container_width=True, type="primary"):
-                st.session_state.timer_running = True
-                st.session_state.timer_paused = False
-                st.session_state.timer_seconds = task.timer_minutes * 60
-                st.rerun()
-        
-        with col2:
-            if st.button("⏭️ Skip Task", use_container_width=True):
-                task.skip()
-                session.next_task()
-                st.session_state.storage.save_session(session)
-                st.toast(get_encouragement("skipped"))
-                st.rerun()
-    
+        with task_list_placeholder.container():
+            # Show all tasks list (like confirm_tasks page)
+            st.markdown("### Tasks")
+            st.write("")
+            for t in session.tasks:
+                is_current = (t.task_number == task.task_number)
+                render_task_card(t, is_current=is_current)
+            
+            st.write("")
+            st.markdown("---")
+            st.write("")
+            
+            # Show current task details - focused view
+            st.markdown(f"### ▶️ Task {task.task_number} of {total_tasks}: {task.description}")
+            st.markdown(f"**Time: {task.timer_minutes} minutes**")
+            st.write("")
+            
+            # Timer controls
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("▶️ Start Timer", use_container_width=True, type="primary"):
+                    st.session_state.timer_running = True
+                    st.session_state.timer_paused = False
+                    st.session_state.timer_seconds = task.timer_minutes * 60
+                    st.rerun()
+            
+            with col2:
+                if st.button("⏭️ Skip Task", use_container_width=True):
+                    task.skip()
+                    session.next_task()
+                    st.session_state.storage.save_session(session)
+                    st.toast(get_encouragement("skipped"))
+                    st.rerun()
     else:
-        # Timer is running
+        # Timer is running - clear the task list placeholder completely
+        task_list_placeholder.empty()
+        
+        # Show current task information before timer starts
+        st.markdown(f"### ▶️ Task {task.task_number} of {total_tasks}: {task.description}")
+        st.markdown(f"**Time: {task.timer_minutes} minutes**")
+        st.write("")
+        
         run_timer(task)
 
 
@@ -818,8 +899,10 @@ def run_timer(task):
     """Run the countdown timer."""
     session = st.session_state.current_session
     total_seconds = task.timer_minutes * 60
+    total_tasks = len(session.tasks)
     
     # Create placeholders
+    task_info_placeholder = st.empty()
     timer_placeholder = st.empty()
     button_placeholder = st.empty()
     
@@ -905,6 +988,12 @@ def run_timer(task):
 def page_task_complete():
     """Handle task completion."""
     session = st.session_state.current_session
+    
+    if not session:
+        st.session_state.page = "home"
+        st.rerun()
+        return
+    
     task = session.get_current_task()
     
     if not task:
@@ -999,10 +1088,11 @@ def page_extend_time():
             st.session_state.timer_paused = False
             # Update task timer to track total allocated time (persistent data)
             session = st.session_state.current_session
-            task = session.get_current_task()
-            if task:
-                task.timer_minutes += extra_minutes
-                st.session_state.storage.save_session(session)
+            if session:
+                task = session.get_current_task()
+                if task:
+                    task.timer_minutes += extra_minutes
+                    st.session_state.storage.save_session(session)
             st.session_state.page = "run_session"
             st.rerun()
 
