@@ -21,6 +21,7 @@ def setup():
         # the st module.
         st.session_state[APP] = task_app.TaskApp("/tmp/cs5001_tasklist.json")
     ai.init_session_state()
+    ai.set_style()
 
 
 def home_page():
@@ -151,10 +152,10 @@ def tasks_main():
         view_completed_tasks_page()
 
 def home():
-    if st.button("AI", key="goto_ai", use_container_width=True):
+    if st.button("🗺️ Strategic Planning (AI Coach)", key="goto_ai", use_container_width=True):
         st.session_state.page = "home"
         st.rerun()
-    if st.button("Tasks", key="goto_tasks", use_container_width=True):
+    if st.button("✅ Quick Daily Tasks (Task Manager)", key="goto_tasks", use_container_width=True):
         st.session_state.page = TASKS_HOME
         st.rerun()
 
