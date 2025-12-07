@@ -1,4 +1,4 @@
-# Sakura Hashimoto
+# Sakura Hashimoto(003186429)
 import streamlit as st
 import task_app
 import quotes
@@ -26,7 +26,7 @@ def setup():
 
 def home_page():
     app = st.session_state[APP]
-    st.markdown(f"# 🎁 {quotes.get_random_quote()}")
+    st.markdown(f"### 🎁 {quotes.get_random_quote()}")
     col1, col2 = st.columns(2)
     with col1:
         render_tasks()
@@ -45,8 +45,7 @@ def home_page():
         ):
             app.page = task_app.VIEW_COMPLETED_TASKS_PAGE
             st.rerun()
-        if st.button("Quit", key="quit", use_container_width=True):
-            app.quit()
+    
         if st.button("Reset", key="reset", use_container_width=True):
             app.full_reset()
             st.rerun()
@@ -87,7 +86,8 @@ def complete_task_callback():
     task_number = st.session_state[COMPLETE_TASK]
     app.complete_task(task_number)
     st.session_state[COMPLETE_TASK] = ""
-    st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉")
+    st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉" )
+    st.balloons()
 
 
 def complete_task_page():
@@ -127,7 +127,7 @@ def view_completed_tasks_page():
     if len(completed_tasks) == 0:
         st.markdown("## You currently have no completed tasks")
     else:
-        st.markdown(compliment_quotes.get_random_compliment_quote())
+        st.markdown(f"🎉 {compliment_quotes.get_random_compliment_quote()}")
         st.markdown("## Completed Tasks:")
         for index, task in enumerate(completed_tasks):
             st.markdown(f"{index + 1}. {task}")
