@@ -21,12 +21,12 @@ class AIHelper:
                 raise ValueError("GEMINI_API_KEY is required. Please set it in .env file.")
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
-                # Try gemini-2.5-flash, fallback to gemini-2.0-flash if needed
+                # Try gemini-2.5-flash-lite, fallback to gemini-2.5-flash if needed
                 try:
-                    self.model = genai.GenerativeModel("gemini-2.0-flash")
+                    self.model = genai.GenerativeModel("gemini-2.5-flash-lite")
                 except Exception:
                     # Fallback to 1.5-flash if 2.0-flash is not available
-                    self.model = genai.GenerativeModel("Gemini 1.5 Flash")
+                    self.model = genai.GenerativeModel("gemini-2.5-flash")
             except Exception as e:
                 raise ValueError(f"Failed to initialize Gemini API: {str(e)}. Please check your API key.")
         else:
