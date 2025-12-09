@@ -11,6 +11,7 @@ import random
 import sys
 import os
 import quotes
+import compliment_quotes
 
 # Add the ai_task_coach directory to Python path so imports work when running directly
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -119,12 +120,12 @@ def set_style():
             background: linear-gradient(135deg, #FFFBE8 0%, #FFF5DC 100%) !important;
         }
         
-        /* Primary buttons - Softer light sage green */
+        /* Primary buttons - Softer light green */
         .stButton > button[kind="primary"] {
-            background: linear-gradient(135deg, #E2ECC8 0%, #D8E5BC 100%) !important;
+            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
             color: #4A5540 !important;
             border: none !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(165, 185, 120, 0.2) !important;
+            box-shadow: 0 4px 15px rgba(220, 160, 110, 0.15) !important;
         }
         
         .stButton > button[kind="primary"]:hover {
@@ -199,12 +200,12 @@ def set_style():
             box-shadow: 0 3px 12px rgba(180, 140, 100, 0.1);
         }
         
-        /* ALERTS/INFO BOXES - light green gradient */
+        /* ALERTS/INFO BOXES - soft light orange gradient */
         .stAlert {
-            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
+            background: linear-gradient(135deg, #FFE9D6 0%, #FFDCC3 100%) !important;
             border-radius: 20px !important;
             border: none !important;
-            box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
+            box-shadow: 0 4px 15px rgba(220, 160, 110, 0.15) !important;
         }
         
         .stAlert > div {
@@ -268,9 +269,9 @@ def set_style():
         
         /* Unfinished Session Banner - Light green with mini Continue button */
         .unfinished-session-btn {
-            background: linear-gradient(135deg, #E8F5E0 0%, #D8ECCE 100%) !important;
-            color: #3D4A2D !important;
-            box-shadow: 0 4px 15px rgba(140, 180, 100, 0.15) !important;
+            background: linear-gradient(135deg, #FFE9D6 0%, #FFDCC3 100%) !important;
+            color: #4A3A32 !important;
+            box-shadow: 0 4px 15px rgba(220, 160, 110, 0.15) !important;
             padding: 18px 22px !important;
             padding-right: 120px !important;
             font-weight: 600 !important;
@@ -370,7 +371,7 @@ def render_quotes():
         quote_text = f'🎁 "{quote_sentence}"'
     # Quote display - simple with quotation marks, larger font, black color
     st.markdown(f"""
-    <p style="font-size: 1.8rem; font-weight: 600; font-style: italic; color: #000000; font-family: 'DM Sans', sans-serif; line-height: 1.5; margin: 0 0 20px 0;">{quote_text}</p>
+    <p style="font-size: 1.2rem; font-weight: 300; font-style: italic; color: #000000; font-family: 'DM Sans', sans-serif; line-height: 1.5; margin: 0 0 20px 0;">{quote_text}</p>
     """, unsafe_allow_html=True)
 
 def render_task_card(task, is_current=False):
@@ -887,7 +888,7 @@ def page_run_session():
             st.write("")
             
             # Timer controls
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             
             with col1:
                 if st.button("▶️ Start Timer", use_container_width=True, type="primary"):
@@ -902,6 +903,18 @@ def page_run_session():
                     session.next_task()
                     st.session_state.storage.save_session(session)
                     st.toast(get_encouragement("skipped"))
+                    st.rerun()
+            
+            with col3:
+                if st.button("💾 Save & Exit", use_container_width=True):
+                    session.pause()
+                    st.session_state.storage.save_session(session)
+                    st.session_state.current_session = None
+                    st.session_state.timer_running = False
+                    st.session_state.timer_paused = False
+                    st.session_state.timer_seconds = 0
+                    st.session_state.page = "home"
+                    st.toast("Session saved! See you next time!")
                     st.rerun()
     else:
         # Timer is running - clear the task list placeholder completely
@@ -1023,29 +1036,30 @@ def page_task_complete():
     
     # Nice completion banner - matches Task Coach style (white/frosted glass)
     # With celebration animation
-    st.markdown("""
+    compliment_text = compliment_quotes.get_random_compliment_quote()
+    banner_html = f"""
     <style>
-        @keyframes celebrate-bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        @keyframes fade-in-up {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .celebration-icon {
+        @keyframes celebrate-bounce {{
+            0%, 100% {{ transform: scale(1); }}
+            50% {{ transform: scale(1.1); }}
+        }}
+        @keyframes fade-in-up {{
+            0% {{ opacity: 0; transform: translateY(20px); }}
+            100% {{ opacity: 1; transform: translateY(0); }}
+        }}
+        .celebration-icon {{
             animation: celebrate-bounce 0.6s ease-in-out 3;
-        }
-        .celebration-text {
+        }}
+        .celebration-text {{
             animation: fade-in-up 0.5s ease-out;
-        }
+        }}
     </style>
     <div style="text-align: center; padding: 45px 35px; background: linear-gradient(135deg, #FFFEF8 0%, #FBF7F0 100%); border-radius: 28px; margin-bottom: 20px; box-shadow: 0 8px 35px rgba(180, 140, 100, 0.12);">
         <p class="celebration-icon" style="font-size: 3rem; margin: 0;">✨</p>
-        <h2 class="celebration-text" style="color: #2D2A26 !important; margin: 15px 0 10px 0; font-size: 1.8rem; font-weight: 700;">Time's up!</h2>
-        <p class="celebration-text" style="font-size: 1.05rem; color: #6B635A; margin: 0; font-weight: 400;">Great effort on this task!</p>
+        <h2 class="celebration-text" style="color: #2D2A26 !important; margin: 15px 0 10px 0; font-size: 1.8rem; font-weight: 700;">{compliment_text}</h2>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(banner_html, unsafe_allow_html=True)
     
     st.markdown(f"**Task:** {task.description}")
     st.write("")
@@ -1056,7 +1070,7 @@ def page_task_complete():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("✅ Done!", use_container_width=True, type="primary"):
+        if st.button("✅ Complete!", use_container_width=True, type="primary"):
             task.complete()
             session.next_task()
             st.session_state.storage.save_session(session)
@@ -1153,6 +1167,16 @@ def page_history():
     
     st.write("")
     st.write("")
+    
+    # Clear All button - only show if there are completed sessions
+    if completed:
+        if st.button("🗑️ Clear All", use_container_width=True):
+            # Delete all completed sessions
+            for session in completed:
+                st.session_state.storage.delete_session(session.session_id)
+            st.rerun()
+        st.write("")
+    
     if st.button("← Back", use_container_width=True):
         st.session_state.page = "home"
         st.rerun()

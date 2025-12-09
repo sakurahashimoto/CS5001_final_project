@@ -27,6 +27,7 @@ def setup():
 def home_page():
     app = st.session_state[APP]
     ai.render_quotes()
+    st.write("")
     col1, col2 = st.columns(2)
     with col1:
         render_tasks()
@@ -34,21 +35,25 @@ def home_page():
         if st.button("Add Task", key="add_task", use_container_width=True):
             app.page = task_app.ADD_TASK_PAGE
             st.rerun()
+        st.write("")
         if st.button("Complete A Task", key="complete_task", use_container_width=True):
             app.page = task_app.COMPLETE_TASK_PAGE
             st.rerun()
+        st.write("")
         if st.button("Remove A Task", key="remove_task", use_container_width=True):
             app.page = task_app.REMOVE_TASK_PAGE
             st.rerun()
+        st.write("")
         if st.button(
             "View Completed Tasks", key="view_completed_tasks", use_container_width=True
         ):
             app.page = task_app.VIEW_COMPLETED_TASKS_PAGE
             st.rerun()
-    
+        st.write("")
         if st.button("Reset", key="reset", use_container_width=True):
             app.full_reset()
             st.rerun()
+        st.write("")
         if st.button("Main Menu", key="main_menu", use_container_width=True):
             app.page = task_app.HOME_PAGE
             st.session_state.page = "full_home"
@@ -165,6 +170,9 @@ def home():
     if st.button("🗺️ Strategic Planning (AI Coach)", key="goto_ai", use_container_width=True):
         st.session_state.page = "home"
         st.rerun()
+    
+    st.write("")
+
     if st.button("✅ Quick Daily Tasks (Task Manager)", key="goto_tasks", use_container_width=True):
         st.session_state.page = TASKS_HOME
         st.rerun()
