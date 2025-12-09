@@ -161,6 +161,7 @@ def tasks_main():
         view_completed_tasks_page()
 
 def home():
+    ai.render_welcome()
     if st.button("🗺️ Strategic Planning (AI Coach)", key="goto_ai", use_container_width=True):
         st.session_state.page = "home"
         st.rerun()

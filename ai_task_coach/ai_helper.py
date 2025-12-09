@@ -19,8 +19,16 @@ class AIHelper:
         if model is None:
             if not GEMINI_API_KEY:
                 raise ValueError("GEMINI_API_KEY is required. Please set it in .env file.")
-            genai.configure(api_key=GEMINI_API_KEY)
-            self.model = genai.GenerativeModel("gemini-2.0-flash")
+            try:
+                genai.configure(api_key=GEMINI_API_KEY)
+                # Try gemini-2.5-flash, fallback to gemini-2.0-flash if needed
+                try:
+                    self.model = genai.GenerativeModel("gemini-2.5-flash")
+                except Exception:
+                    # Fallback to 1.5-flash if 2.0-flash is not available
+                    self.model = genai.GenerativeModel("gemini-2.0-flash")
+            except Exception as e:
+                raise ValueError(f"Failed to initialize Gemini API: {str(e)}. Please check your API key.")
         else:
             self.model = model
 
@@ -31,6 +39,7 @@ class AIHelper:
 
         :param goal: the user's input
         :return: True if valid goal, False if gibberish/unclear
+        :raises: Exception if AI call fails
         """
         prompt = f"""
         Is the following a clear, actionable goal or task that someone might want to accomplish?
@@ -57,22 +66,32 @@ class AIHelper:
         :param focus: specific focus area when adjust="different_focus"
         :param retries: number of attempts
         :return: list of Task objects, or None if all retries fail
+        :raises: Exception if all retries fail with API errors
         """
 
+        last_error = None
         for attempt in range(retries):
-            prompt = self._build_prompt(goal, time_available, adjust, focus)
-            response_text = self._call_ai(prompt)
+            try:
+                prompt = self._build_prompt(goal, time_available, adjust, focus)
+                response_text = self._call_ai(prompt)
 
-            if response_text is None:
+                if response_text is None:
+                    continue
+
+                tasks = self._parse_response(response_text)
+
+                if len(tasks) == 0:
+                    continue
+
+                return tasks
+            except Exception as e:
+                last_error = e
+                # Continue to next retry
                 continue
 
-            tasks = self._parse_response(response_text)
-
-            if len(tasks) == 0:
-                continue
-
-            return tasks
-
+        # If we get here, all retries failed
+        if last_error:
+            raise Exception(f"Failed to break down goal after {retries} attempts: {str(last_error)}")
         return None
 
 
@@ -144,9 +163,31 @@ class AIHelper:
         """
         try:
             response = self.model.generate_content(prompt)
-            return response.text
-        except Exception:
+            
+            # Handle different response formats
+            if hasattr(response, 'text') and response.text:
+                return response.text
+            elif hasattr(response, 'candidates') and response.candidates:
+                # Try to get text from candidates
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                    parts = candidate.content.parts
+                    if parts and hasattr(parts[0], 'text'):
+                        return parts[0].text
+            elif hasattr(response, 'parts') and response.parts:
+                # Alternative response structure
+                if hasattr(response.parts[0], 'text'):
+                    return response.parts[0].text
+            
+            # If we get here, response structure is unexpected
+            print(f"Warning: AI response has unexpected structure. Response type: {type(response)}")
             return None
+        except Exception as e:
+            # Log the actual error for debugging
+            error_msg = f"Error calling AI: {type(e).__name__}: {str(e)}"
+            print(error_msg)
+            # Re-raise with more context for better error messages
+            raise Exception(f"AI API call failed: {str(e)}") from e
 
 
     def _parse_response(self, response_text):

@@ -476,8 +476,6 @@ def render_timer(minutes, seconds, total_seconds, elapsed_seconds):
 
 def page_home():
     """Home page with main menu."""
-    render_welcome()
-    
     # Check for unfinished session
     unfinished = st.session_state.storage.get_unfinished_session()
     
@@ -504,7 +502,9 @@ def page_home():
             st.session_state.current_session = unfinished
             st.session_state.page = "run_session"
             st.rerun()
-    
+
+    st.write("")
+
     if st.button("Main Menu", use_container_width=True):
         st.session_state.page = "full_home"
         st.rerun()
@@ -1225,4 +1225,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

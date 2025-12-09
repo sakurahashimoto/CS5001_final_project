@@ -67,5 +67,3 @@ MOTIVATIONAL_QUOTES = [
 
 def get_random_quote():
     return random.choice(MOTIVATIONAL_QUOTES)
-
-
