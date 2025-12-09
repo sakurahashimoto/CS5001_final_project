@@ -944,6 +944,7 @@ def run_timer(task):
     # Create placeholders
     task_info_placeholder = st.empty()
     timer_placeholder = st.empty()
+    pause_banner_placeholder = st.empty()
     button_placeholder = st.empty()
     
     while st.session_state.timer_seconds > 0 and st.session_state.timer_running:
@@ -954,6 +955,7 @@ def run_timer(task):
                 secs = st.session_state.timer_seconds % 60
                 elapsed = total_seconds - st.session_state.timer_seconds
                 render_timer(mins, secs, total_seconds, elapsed)
+            with pause_banner_placeholder.container():
                 st.warning("⏸️ Timer Paused")
             
             with button_placeholder.container():
@@ -982,6 +984,7 @@ def run_timer(task):
             return  # Exit the loop, wait for user interaction
         
         # Running timer
+        pause_banner_placeholder.empty()
         mins = st.session_state.timer_seconds // 60
         secs = st.session_state.timer_seconds % 60
         elapsed = total_seconds - st.session_state.timer_seconds
