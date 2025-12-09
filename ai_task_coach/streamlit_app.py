@@ -328,6 +328,11 @@ def init_session_state():
     
     if "timer_seconds" not in st.session_state:
         st.session_state.timer_seconds = 0
+
+    # Track the total length of the *current* countdown. This lets us reset the
+    # progress bar cleanly when the user adds more time mid-task.
+    if "current_timer_total_seconds" not in st.session_state:
+        st.session_state.current_timer_total_seconds = 0
     
     if "regenerate_count" not in st.session_state:
         st.session_state.regenerate_count = 0
@@ -895,6 +900,7 @@ def page_run_session():
                     st.session_state.timer_running = True
                     st.session_state.timer_paused = False
                     st.session_state.timer_seconds = task.timer_minutes * 60
+                    st.session_state.current_timer_total_seconds = st.session_state.timer_seconds
                     st.rerun()
             
             with col2:
@@ -913,6 +919,7 @@ def page_run_session():
                     st.session_state.timer_running = False
                     st.session_state.timer_paused = False
                     st.session_state.timer_seconds = 0
+                    st.session_state.current_timer_total_seconds = 0
                     st.session_state.page = "home"
                     st.toast("Session saved! See you next time!")
                     st.rerun()
@@ -931,7 +938,7 @@ def page_run_session():
 def run_timer(task):
     """Run the countdown timer."""
     session = st.session_state.current_session
-    total_seconds = task.timer_minutes * 60
+    total_seconds = st.session_state.current_timer_total_seconds or (task.timer_minutes * 60)
     total_tasks = len(session.tasks)
     
     # Create placeholders
@@ -968,6 +975,7 @@ def run_timer(task):
                         st.session_state.timer_running = False
                         st.session_state.timer_paused = False
                         st.session_state.timer_seconds = 0
+                        st.session_state.current_timer_total_seconds = 0
                         st.session_state.page = "home"
                         st.toast("Session saved! See you next time!")
                         st.rerun()
@@ -991,6 +999,7 @@ def run_timer(task):
                     st.session_state.timer_running = False
                     st.session_state.timer_paused = False
                     st.session_state.timer_seconds = 0
+                    st.session_state.current_timer_total_seconds = 0
                     st.session_state.page = "home"
                     st.toast("Session saved! See you next time!")
                     st.rerun()
@@ -1011,6 +1020,7 @@ def run_timer(task):
     # Timer finished
     if st.session_state.timer_seconds <= 0:
         st.session_state.timer_running = False
+        st.session_state.current_timer_total_seconds = 0
         st.balloons()
         st.session_state.page = "task_complete"
         st.rerun()
@@ -1118,6 +1128,7 @@ def page_extend_time():
     with col2:
         if st.button(f"▶️ Add {extra_minutes} Minutes", use_container_width=True, type="primary"):
             st.session_state.timer_seconds = extra_minutes * 60
+            st.session_state.current_timer_total_seconds = st.session_state.timer_seconds
             st.session_state.timer_running = True
             st.session_state.timer_paused = False
             # Update task timer to track total allocated time (persistent data)
