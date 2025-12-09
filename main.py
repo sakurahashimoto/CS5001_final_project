@@ -84,11 +84,16 @@ def add_task_page():
 def complete_task_callback():
     app = st.session_state[APP]
     task_number = st.session_state[COMPLETE_TASK]
-    app.complete_task(task_number)
-    st.session_state[COMPLETE_TASK] = ""
-    st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉" )
-    st.balloons()
+    try:
+        app.complete_task(task_number)
+        st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉" )
+        st.balloons()
 
+    except Exception as e:
+        st.toast(str(e))
+
+    st.session_state[COMPLETE_TASK] = ""
+   
 
 def complete_task_page():
     app = st.session_state[APP]
@@ -106,7 +111,11 @@ def complete_task_page():
 def remove_task_callback():
     app = st.session_state[APP]
     task_number = st.session_state[REMOVE_TASK]
-    app.remove_task(task_number)
+    try:
+        app.remove_task(task_number)
+    except Exception as e:
+        st.toast(str(e))
+
     st.session_state[REMOVE_TASK] = ""
 
 
