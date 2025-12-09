@@ -26,7 +26,7 @@ def setup():
 
 def home_page():
     app = st.session_state[APP]
-    st.markdown(f"### 🎁 {quotes.get_random_quote()}")
+    ai.render_quotes()
     col1, col2 = st.columns(2)
     with col1:
         render_tasks()

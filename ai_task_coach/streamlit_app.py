@@ -10,6 +10,7 @@ import time
 import random
 import sys
 import os
+import quotes
 
 # Add the ai_task_coach directory to Python path so imports work when running directly
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -355,9 +356,22 @@ def get_encouragement(status):
     return random.choice(messages)
 
 
-
-
 # UI COMPONENTS - reusable render functions
+
+def render_quotes():
+    """Render a random encouraging quote."""
+    random_quote = quotes.get_random_quote()
+    quote_parts = random_quote.split('-')
+    quote_sentence = quote_parts[0].strip()
+    if len(quote_parts) > 1:
+        quote_author = quote_parts[1].strip()
+        quote_text = f'🎁 "{quote_sentence}" - {quote_author}'
+    else:
+        quote_text = f'🎁 "{quote_sentence}"'
+    # Quote display - simple with quotation marks, larger font, black color
+    st.markdown(f"""
+    <p style="font-size: 1.8rem; font-weight: 600; font-style: italic; color: #000000; font-family: 'DM Sans', sans-serif; line-height: 1.5; margin: 0 0 20px 0;">{quote_text}</p>
+    """, unsafe_allow_html=True)
 
 def render_task_card(task, is_current=False):
     """Render a single task card."""
@@ -478,7 +492,8 @@ def page_home():
     """Home page with main menu."""
     # Check for unfinished session
     unfinished = st.session_state.storage.get_unfinished_session()
-    
+    render_quotes()
+    st.write("")
     st.markdown("### What would you like to do?")
     st.write("")
     
