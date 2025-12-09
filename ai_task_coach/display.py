@@ -4,6 +4,8 @@ display.py
 Handles all terminal display (messages, tasks, encouragement).
 """
 
+import random
+
 class Display:
     def __init__(self, print_func=None):
         """
@@ -82,8 +84,6 @@ class Display:
 
         :param status: "completed", or "skipped"
         """
-        import random
-
         messages = self.encouragements.get(status, self.encouragements["completed"])
         message = random.choice(messages)
 

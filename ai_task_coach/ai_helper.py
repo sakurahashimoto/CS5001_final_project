@@ -25,7 +25,7 @@ class AIHelper:
                 try:
                     self.model = genai.GenerativeModel("gemini-2.5-flash-lite")
                 except Exception:
-                    # Fallback to 1.5-flash if 2.0-flash is not available
+                    # Fallback to gemini-2.5-flash if gemini-2.5-flash-lite is not available
                     self.model = genai.GenerativeModel("gemini-2.5-flash")
             except Exception as e:
                 raise ValueError(f"Failed to initialize Gemini API: {str(e)}. Please check your API key.")
