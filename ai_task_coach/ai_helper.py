@@ -83,7 +83,7 @@ class AIHelper:
                 if len(tasks) == 0:
                     continue
 
-                return tasks
+                return self._fit_tasks_to_time(tasks, time_available)
             except Exception as e:
                 last_error = e
                 # Continue to next retry
@@ -235,6 +235,54 @@ class AIHelper:
                     description=description,
                     timer_minutes=minutes
                 ))
+
+        return tasks
+
+    def _fit_tasks_to_time(self, tasks, time_available):
+        """
+        Normalize task durations to fit exactly into time_available minutes.
+        - If the AI under-allocates, put the remaining minutes into the last task.
+        - If the AI over-allocates, scale down proportionally, then fix rounding drift.
+        """
+        if not tasks:
+            return tasks
+
+        total = sum(t.timer_minutes for t in tasks)
+        if total == 0:
+            return tasks
+
+        # Under-allocated: add remainder to last task
+        if total < time_available:
+            remainder = time_available - total
+            tasks[-1].timer_minutes += remainder
+            return tasks
+
+        # Perfect fit
+        if total == time_available:
+            return tasks
+
+        # Over-allocated: scale down
+        ratio = time_available / total
+        new_minutes = []
+        for t in tasks:
+            scaled = max(1, int(round(t.timer_minutes * ratio)))
+            new_minutes.append(scaled)
+
+        # Fix rounding drift to hit the exact total
+        drift = time_available - sum(new_minutes)
+        idx = 0
+        while drift != 0 and idx < len(new_minutes):
+            if drift > 0:
+                new_minutes[idx] += 1
+                drift -= 1
+            else:
+                if new_minutes[idx] > 1:
+                    new_minutes[idx] -= 1
+                    drift += 1
+            idx = (idx + 1) % len(new_minutes)
+
+        for t, minutes in zip(tasks, new_minutes):
+            t.timer_minutes = minutes
 
         return tasks
 
