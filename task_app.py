@@ -80,7 +80,7 @@ class TaskApp:
             index = int(input_str) - 1
             #index starting from 0 is less than or equal to lengh of lists or less than 0
             if index >= len(self.data[TASK_LIST_KEY]) or index < 0:
-                return
+                raise Exception("Enter a valid number")
                 # print("Enter a valid number please")
             else:
                 self.data[TASK_LIST_KEY].pop(index)
@@ -88,8 +88,10 @@ class TaskApp:
                 # print("Tasks left are: ")
                     # self.view_tasks()
                     # break
-            # else:
-            #     print("Enter a valid number please: ")
+        else:
+            raise Exception("Enter a valid number")
+
+            
 
     def view_tasks(self):
         #same as len(self.data[TASK_LIST_KEY]) == 0
@@ -109,9 +111,10 @@ class TaskApp:
             # self.view_tasks()
             # ask_if_completed_str = input("Enter the task number completed: ")
         if ask_if_completed_str.isdigit():
+
             index = int(ask_if_completed_str) - 1
             if index >= len(self.data[TASK_LIST_KEY]) or index < 0:
-                return
+                raise Exception("Enter a valid number")
                 # print("Enter a valid number please")
             else:
                 completed_task = self.data[TASK_LIST_KEY].pop(index)
@@ -120,6 +123,8 @@ class TaskApp:
                 # print("Task left is: ")
                 # self.view_tasks()
                 # self.view_completed_task_list()
+        else:
+            raise Exception("Enter a valid number")
 
     def view_completed_task_list(self):
         if not self.data[COMPLETED_TASK_LIST_KEY]:
