@@ -270,8 +270,11 @@ class AIHelper:
 
         # Fix rounding drift to hit the exact total
         drift = time_available - sum(new_minutes)
+        max_iterations = len(new_minutes) * abs(drift) + 1  # Safety limit
+        iterations = 0
         idx = 0
-        while drift != 0 and idx < len(new_minutes):
+        
+        while drift != 0 and iterations < max_iterations:
             if drift > 0:
                 new_minutes[idx] += 1
                 drift -= 1
@@ -280,6 +283,7 @@ class AIHelper:
                     new_minutes[idx] -= 1
                     drift += 1
             idx = (idx + 1) % len(new_minutes)
+            iterations += 1
 
         for t, minutes in zip(tasks, new_minutes):
             t.timer_minutes = minutes
