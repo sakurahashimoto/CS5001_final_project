@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scratch One More!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#000;overflow:hidden;cursor:pointer}
+    .slide{width:100vw;height:100vh;background:linear-gradient(135deg,#fce4d6 0%,#fff9f0 50%,#e8f5e9 100%);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px}
+    .slide.active{display:flex}
+    .box{background:rgba(255,255,255,0.7);border-radius:24px;padding:48px 64px;box-shadow:0 4px 20px rgba(0,0,0,0.1);text-align:center;max-width:600px}
+    h1{font-size:64px;font-weight:700}
+    h1 span:first-child{color:#1f2937}
+    h1 span:last-child{color:#e07850}
+    .tagline{font-size:24px;color:#6b7280;margin-top:16px;font-style:italic;font-weight:600}
+    .footer{margin-top:40px;padding-top:24px;border-top:1px solid #d1d5db}
+    .names{font-size:20px;color:#374151}
+    .course{font-size:18px;color:#6b7280;margin-top:8px}
+    h2{font-size:48px;font-weight:700;color:#1f2937;margin-bottom:16px}
+    .subtitle{font-size:24px;color:#374151}
+    .cards{display:flex;gap:40px;margin-top:40px}
+    .card{background:#fff;border-radius:16px;padding:40px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);width:220px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .emoji{font-size:56px;margin-bottom:20px}
+    .card h3{font-size:22px;font-weight:700;color:#1f2937;margin-bottom:8px}
+    .card p{font-size:16px;color:#6b7280}
+    .boxes{display:flex;gap:48px}
+    .sbox{background:#fff;border-radius:16px;padding:36px;width:360px;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+    .todo{border:3px solid #a7d7a7}
+    .ai{border:3px solid #fce4d6}
+    .sbox h3{font-size:26px;font-weight:700;color:#1f2937;margin-top:12px}
+    .sbox .sub{font-size:15px;color:#6b7280;font-style:italic;margin-top:4px}
+    .features{margin-top:28px;text-align:left}
+    .feature{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;font-size:17px;color:#374151}
+    .cg{color:#22c55e;font-weight:bold;font-size:20px}
+    .co{color:#e07850;font-weight:bold;font-size:20px}
+    .demo h2{font-size:96px}
+    .demo p{font-size:48px;color:#6b7280}
+    .dots{margin-top:32px;display:flex;gap:16px}
+    .dot{width:20px;height:20px;border-radius:50%}
+    .d1{background:#fdba74}
+    .d2{background:#fb923c}
+    .d3{background:#f97316}
+    .content{display:flex;gap:60px;align-items:center}
+    .codebox{background:#fff;border-radius:12px;padding:24px;box-shadow:0 4px 15px rgba(0,0,0,0.1);width:440px}
+    .codetop{display:flex;gap:8px;margin-bottom:16px}
+    .cdot{width:14px;height:14px;border-radius:50%}
+    .cred{background:#ef4444}
+    .cyel{background:#eab308}
+    .cgrn{background:#22c55e}
+    pre{font-family:'Courier New',monospace;font-size:14px;color:#1f2937;line-height:1.6}
+    .blu{color:#2563eb}
+    .ora{color:#ca8a04}
+    .pnk{color:#dc2626}
+    .right{display:flex;flex-direction:column;align-items:center;gap:20px}
+    .row{display:flex;align-items:center;gap:20px}
+    .pill{padding:18px 36px;border-radius:12px;font-size:22px;font-weight:700}
+    .pop{background:#dbeafe;color:#1d4ed8}
+    .append{background:#f3e8ff;color:#7c3aed}
+    .plus{font-size:28px;color:#9ca3af}
+    .arrow{font-size:36px;color:#9ca3af}
+    .result{background:#dcfce7;border-radius:12px;padding:24px 48px;text-align:center}
+    .result p:first-child{font-size:20px;font-weight:700;color:#15803d}
+    .result p:last-child{font-size:16px;color:#16a34a;margin-top:4px}
+    .concept{border-radius:12px;padding:24px 48px;text-align:center;width:280px}
+    .encap{background:#ffedd5}
+    .encap p:first-child{font-size:22px;font-weight:700;color:#c2410c}
+    .encap p:last-child{font-size:16px;color:#ea580c;margin-top:8px}
+    .abst{background:#dcfce7}
+    .abst p:first-child{font-size:22px;font-weight:700;color:#15803d}
+    .abst p:last-child{font-size:16px;color:#16a34a;margin-top:8px}
+    .flow{background:#e5e7eb;border-radius:12px;padding:14px 36px;margin-top:8px}
+    .flow p{font-size:16px;color:#374151;font-weight:500}
+    .lbox{background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 15px rgba(0,0,0,0.08);width:300px;height:240px}
+    .lbox-h{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+    .lbox-h span{font-size:32px}
+    .lbox-h h3{font-size:24px;font-weight:700;color:#374151}
+    .list{display:flex;flex-direction:column;gap:22px}
+    .item{display:flex;align-items:flex-start;gap:14px}
+    .x{color:#ef4444;font-size:22px;font-weight:700}
+    .chk{color:#22c55e;font-size:22px;font-weight:700}
+    .item-text{color:#374151;font-size:18px;line-height:1.4}
+    .item-text small{display:block;color:#6b7280;font-size:14px}
+    .bigarrow{font-size:56px;color:#9ca3af}
+    .sumbox{background:#fff;border-radius:24px;padding:56px 72px;box-shadow:0 4px 20px rgba(0,0,0,0.1);text-align:center;max-width:750px}
+    .maintext{font-size:24px;color:#374151;line-height:1.8;margin-bottom:36px}
+    .mut{color:#60a5fa;font-weight:700}
+    .oop{color:#a78bfa;font-weight:700}
+    .cta{background:#fef3c7;padding:14px 28px;border-radius:8px;font-size:22px;font-weight:700;font-style:italic;color:#374151;display:inline-block}
+    .citbox{background:#fff;border-radius:16px;padding:36px 48px;box-shadow:0 4px 15px rgba(0,0,0,0.08);width:750px}
+    .cit{padding:14px 0;border-bottom:1px solid #f3f4f6;font-size:15px}
+    .cit:last-child{border-bottom:none}
+    .cit strong{color:#1f2937}
+    .cit span{color:#6b7280}
+    .url{color:#9ca3af}
+    .qtext{display:flex;align-items:center;gap:24px}
+    .qtext span{font-size:80px}
+    .qtext h2{font-size:80px}
+    .closebox{background:rgba(255,255,255,0.6);border-radius:16px;padding:24px 48px}
+    .closebox p{font-size:26px;color:#374151}
+    .counter{position:fixed;bottom:20px;right:30px;color:#999;font-size:16px}
+  </style>
+</head>
+<body onclick="next()">
+
+<!-- Slide 1: Title -->
+<div class="slide active">
+  <div class="box">
+    <h1><span>Scratch</span><br><span>One More!</span></h1>
+    <p class="tagline">Break it down, scratch it out</p>
+    <div class="footer">
+      <p class="names">Hyunjoo Shim & Sakura Hashimoto</p>
+      <p class="course">CS5001 Final Project</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2: Problem -->
+<div class="slide">
+  <h2>"I'll start tomorrow..."</h2>
+  <p class="subtitle">Sound familiar?</p>
+  <div class="cards">
+    <div class="card"><div class="emoji">😰</div><h3>Overwhelmed</h3><p>Big goals feel impossible</p></div>
+    <div class="card"><div class="emoji">📋</div><h3>No Plan</h3><p>Where do I begin?</p></div>
+    <div class="card"><div class="emoji">🔄</div><h3>Procrastination</h3><p>The endless cycle</p></div>
+  </div>
+</div>
+
+<!-- Slide 3: Solution -->
+<div class="slide">
+  <h2>Our Solutions</h2>
+  <div class="boxes">
+    <div class="sbox todo" style="text-align:center">
+      <div class="emoji">📝</div>
+      <h3>Todo List</h3>
+      <p class="sub">When you know what to do</p>
+      <div class="features">
+        <div class="feature"><span class="cg">✓</span><span>Simple & clear task management</span></div>
+        <div class="feature"><span class="cg">✓</span><span>Encouraging messages to keep you going</span></div>
+      </div>
+    </div>
+    <div class="sbox ai" style="text-align:center">
+      <div class="emoji">🤖</div>
+      <h3>AI Task Coach</h3>
+      <p class="sub">When you don't know where to start</p>
+      <div class="features">
+        <div class="feature"><span class="co">✓</span><span>Gemini splits goals into small tasks</span></div>
+        <div class="feature"><span class="co">✓</span><span>Built-in timer for each task</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: Demo -->
+<div class="slide demo">
+  <h2>✨ Demo</h2>
+  <p>Let's see it in action</p>
+  <div class="dots"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+</div>
+
+<!-- Slide 5: Mutability -->
+<div class="slide">
+  <h2>Key Concept 1: Mutability</h2>
+  <div class="content">
+    <div class="codebox">
+      <div class="codetop"><div class="cdot cred"></div><div class="cdot cyel"></div><div class="cdot cgrn"></div></div>
+      <pre><span class="blu">def</span> <span class="ora">complete_task</span>(self, ...):
+    ...
+    completed_task = self.data[
+        TASK_LIST_KEY
+    ]<span class="ora">.pop</span>(index)
+
+    self.data[
+        COMPLETED_TASK_LIST_KEY
+    ]<span class="ora">.append</span>(completed_task)
+
+    self.<span class="ora">save_data</span>(self.file_path)</pre>
+    </div>
+    <div class="right">
+      <div class="row"><div class="pill pop">.pop()</div><span class="plus">+</span><div class="pill append">.append()</div></div>
+      <div class="arrow">↓</div>
+      <div class="result"><p>Modify in place</p><p>No new data structures!</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6: OOP -->
+<div class="slide">
+  <h2>Key Concept 2: OOP</h2>
+  <div class="content">
+    <div class="codebox" style="width:500px">
+      <div class="codetop"><div class="cdot cred"></div><div class="cdot cyel"></div><div class="cdot cgrn"></div></div>
+      <pre style="font-size:15px"><span class="blu">class</span> <span class="ora">Task</span>:
+    <span class="blu">def</span> <span class="pnk">__init__</span>(self, task_number, ...):
+        self.task_number = task_number
+        self.description = description
+        self.timer_minutes = timer_minutes
+        self.status = status
+
+    <span class="blu">def</span> <span class="ora">complete</span>(self): ...
+    <span class="blu">def</span> <span class="ora">skip</span>(self): ...
+    <span class="blu">def</span> <span class="ora">update_time</span>(self, ...): ...
+    <span class="blu">def</span> <span class="ora">to_dict</span>(self): ...</pre>
+    </div>
+    <div class="right" style="gap:10px">
+      <div class="concept encap" style="padding:18px 36px;width:250px"><p style="font-size:19px">🔒 Encapsulation</p><p style="font-size:14px">Data + Behavior bundled</p></div>
+      <span class="plus" style="font-size:22px">+</span>
+      <div class="concept abst" style="padding:18px 36px;width:250px"><p style="font-size:19px">🎭 Abstraction</p><p style="font-size:14px">Hide implementation details</p></div>
+      <span class="plus" style="font-size:22px">=</span>
+      <div class="flow" style="padding:12px 28px"><p style="font-size:15px">Modular & Easy to Maintain</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: Lessons -->
+<div class="slide">
+  <h2>Findings & Lessons Learned</h2>
+  <div class="cards" style="margin-top:0">
+    <div class="card"><div class="emoji">🐛</div><h3>Errors are tricky</h3><p style="font-style:italic">"Off by 1" is real!</p></div>
+    <div class="card"><div class="emoji">🏗️</div><h3>OOP Benefits</h3><p>Clean integration of features</p></div>
+  </div>
+</div>
+
+<!-- Slide 8: Limitations -->
+<div class="slide">
+  <h2>Limitations & Future</h2>
+  <div class="boxes" style="align-items:center">
+    <div class="lbox" style="display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div class="lbox-h"><span>📍</span><h3>Current</h3></div>
+      <div class="list" style="align-items:center">
+        <div class="item" style="justify-content:center"><span class="x">✗</span><span class="item-text">No due dates</span></div>
+        <div class="item" style="justify-content:center"><span class="x">✗</span><span class="item-text">No categories</span></div>
+      </div>
+    </div>
+    <span class="bigarrow">→</span>
+    <div class="lbox" style="display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div class="lbox-h"><span>🚀</span><h3>Future</h3></div>
+      <div class="list" style="align-items:center">
+        <div class="item" style="justify-content:center"><span class="chk">✓</span><span class="item-text">Use dictionary</span></div>
+        <div class="item" style="justify-content:center"><span class="chk">✓</span><span class="item-text">Dates & categories</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 9: Summary -->
+<div class="slide">
+  <h2>Quick Summary</h2>
+  <div class="sumbox">
+    <p class="maintext">Demonstrated implementation of <span class="mut">mutability</span> and<br><span class="oop">object-oriented programming</span> through our<br><strong>"Scratch One More!"</strong></p>
+    <span class="cta">"Are you ready to tackle your tasks today?" 🔥</span>
+  </div>
+</div>
+
+<!-- Slide 10: Citations -->
+<div class="slide">
+  <h2>Citations and References</h2>
+  <div class="citbox">
+    <div class="cit"><strong>Python Tutorial:</strong><span> Python Software Foundation. </span><span class="url">docs.python.org/3/tutorial</span></div>
+    <div class="cit"><strong>Streamlit:</strong><span> Streamlit Documentation. </span><span class="url">docs.streamlit.io</span></div>
+    <div class="cit"><strong>Python random:</strong><span> Python Software Foundation. </span><span class="url">docs.python.org/3/library/random.html</span></div>
+    <div class="cit"><strong>Python json:</strong><span> Python Software Foundation. </span><span class="url">docs.python.org/3/library/json.html</span></div>
+    <div class="cit"><strong>pytest:</strong><span> The pytest Development Team. </span><span class="url">docs.pytest.org</span></div>
+    <div class="cit"><strong>Gemini AI:</strong><span> Google. (2025). Gemini (Version 2.5).</span></div>
+  </div>
+</div>
+
+<!-- Slide 11: Closing -->
+<div class="slide">
+  <h2>It was such a pleasure meeting you all!</h2>
+  <div class="emoji" style="margin:32px 0">🎉</div>
+  <div class="closebox"><p>Hyunjoo Shim & Sakura Hashimoto</p></div>
+</div>
+
+<!-- Slide 12: Questions -->
+<div class="slide">
+  <div class="qtext"><span>🙋</span><h2>Questions?</h2></div>
+</div>
+
+<div class="counter"><span id="num">1</span> / 12</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const counter = document.getElementById('num');
+
+function next() {
+  slides[current].classList.remove('active');
+  current = (current + 1) % slides.length;
+  slides[current].classList.add('active');
+  counter.textContent = current + 1;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') next();
+  if (e.key === 'ArrowLeft') {
+    slides[current].classList.remove('active');
+    current = (current - 1 + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    counter.textContent = current + 1;
+  }
+});
+</script>
+</body>
+</html>
