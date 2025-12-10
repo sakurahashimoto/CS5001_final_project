@@ -4,7 +4,6 @@ __pycache__/
 data/
 .idea/
 .vscode/
-PROJECT_DOCUMENTATION.md
 .DS_Store
 *.DS_Store
 assets/
