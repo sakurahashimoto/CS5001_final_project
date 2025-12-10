@@ -6,6 +6,7 @@ Handles all terminal display (messages, tasks, encouragement).
 
 import random
 
+
 class Display:
     def __init__(self, print_func=None):
         """
@@ -19,14 +20,13 @@ class Display:
                 "Great job! You did it! 🎉",
                 "Amazing work! Keep going! 💪",
                 "You're on fire! 🔥",
-                "One step closer to done! ⭐"
+                "One step closer to done! ⭐",
             ],
             "skipped": [
                 "No worries, you can come back to it. 👌",
-                "Sometimes we need to skip ahead. That's okay! 🙂"
-            ]
+                "Sometimes we need to skip ahead. That's okay! 🙂",
+            ],
         }
-
 
     def show_welcome(self, total_completed=0):
         """
@@ -42,7 +42,6 @@ class Display:
             self._print(f"   📊 Total: {total_completed} session(s) completed!")
         self._print()
 
-
     def show_tasks(self, tasks):
         """
         Show list of tasks to user.
@@ -57,11 +56,12 @@ class Display:
 
         for task in tasks:
             status_icon = self._get_status_icon(task.status)
-            self._print(f"  {status_icon} Task {task.task_number}: {task.description} ({task.timer_minutes} min)")
+            self._print(
+                f"  {status_icon} Task {task.task_number}: {task.description} ({task.timer_minutes} min)"
+            )
 
         self._print("-" * 40)
         self._print()
-
 
     def _get_status_icon(self, status):
         """
@@ -70,13 +70,8 @@ class Display:
         :param status: task status string
         :return: emoji icon
         """
-        icons = {
-            "pending": "⬜",
-            "completed": "✅",
-            "skipped": "⏭️"
-        }
+        icons = {"pending": "⬜", "completed": "✅", "skipped": "⏭️"}
         return icons.get(status, "⬜")
-
 
     def show_encouragement(self, status):
         """
@@ -90,7 +85,6 @@ class Display:
         self._print()
         self._print(f"  {message}")
         self._print()
-
 
     def show_summary(self, session):
         """

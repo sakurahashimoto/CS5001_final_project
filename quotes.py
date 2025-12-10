@@ -1,4 +1,4 @@
-#Sakura Hashimoto(003186429)
+# Sakura Hashimoto(003186429)
 import random
 
 MOTIVATIONAL_QUOTES = [
@@ -64,6 +64,7 @@ MOTIVATIONAL_QUOTES = [
     "You are built for this.",
     "Don't wait. The time will never be just right. - Napoleon Hill",
 ]
+
 
 def get_random_quote():
     return random.choice(MOTIVATIONAL_QUOTES)

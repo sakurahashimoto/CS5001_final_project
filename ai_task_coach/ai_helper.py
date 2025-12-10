@@ -18,7 +18,9 @@ class AIHelper:
         """
         if model is None:
             if not GEMINI_API_KEY:
-                raise ValueError("GEMINI_API_KEY is required. Please set it in .env file.")
+                raise ValueError(
+                    "GEMINI_API_KEY is required. Please set it in .env file."
+                )
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
                 # Try gemini-2.5-flash-lite, fallback to gemini-2.5-flash if needed
@@ -28,10 +30,11 @@ class AIHelper:
                     # Fallback to gemini-2.5-flash if gemini-2.5-flash-lite is not available
                     self.model = genai.GenerativeModel("gemini-2.5-flash")
             except Exception as e:
-                raise ValueError(f"Failed to initialize Gemini API: {str(e)}. Please check your API key.")
+                raise ValueError(
+                    f"Failed to initialize Gemini API: {str(e)}. Please check your API key."
+                )
         else:
             self.model = model
-
 
     def validate_goal(self, goal):
         """
@@ -54,7 +57,6 @@ class AIHelper:
         if response and "YES" in response.upper():
             return True
         return False
-
 
     def break_down_goal(self, goal, time_available, adjust=None, focus=None, retries=3):
         """
@@ -91,9 +93,10 @@ class AIHelper:
 
         # If we get here, all retries failed
         if last_error:
-            raise Exception(f"Failed to break down goal after {retries} attempts: {str(last_error)}")
+            raise Exception(
+                f"Failed to break down goal after {retries} attempts: {str(last_error)}"
+            )
         return None
-
 
     def _build_prompt(self, goal, time_available, adjust=None, focus=None):
         """
@@ -153,7 +156,6 @@ class AIHelper:
 
         return prompt
 
-
     def _call_ai(self, prompt):
         """
         Send prompt to Gemini and get response.
@@ -163,24 +165,28 @@ class AIHelper:
         """
         try:
             response = self.model.generate_content(prompt)
-            
+
             # Handle different response formats
-            if hasattr(response, 'text') and response.text:
+            if hasattr(response, "text") and response.text:
                 return response.text
-            elif hasattr(response, 'candidates') and response.candidates:
+            elif hasattr(response, "candidates") and response.candidates:
                 # Try to get text from candidates
                 candidate = response.candidates[0]
-                if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                if hasattr(candidate, "content") and hasattr(
+                    candidate.content, "parts"
+                ):
                     parts = candidate.content.parts
-                    if parts and hasattr(parts[0], 'text'):
+                    if parts and hasattr(parts[0], "text"):
                         return parts[0].text
-            elif hasattr(response, 'parts') and response.parts:
+            elif hasattr(response, "parts") and response.parts:
                 # Alternative response structure
-                if hasattr(response.parts[0], 'text'):
+                if hasattr(response.parts[0], "text"):
                     return response.parts[0].text
-            
+
             # If we get here, response structure is unexpected
-            print(f"Warning: AI response has unexpected structure. Response type: {type(response)}")
+            print(
+                f"Warning: AI response has unexpected structure. Response type: {type(response)}"
+            )
             return None
         except Exception as e:
             # Log the actual error for debugging
@@ -189,11 +195,10 @@ class AIHelper:
             # Re-raise with more context for better error messages
             raise Exception(f"AI API call failed: {str(e)}") from e
 
-
     def _parse_response(self, response_text):
         """
         Parse AI response into a list of Task objects.
-        
+
         Expected AI response format:
             1 | Open textbook | 5
             2 | Read chapter 1 | 15
@@ -230,11 +235,13 @@ class AIHelper:
                 except ValueError:
                     return []
 
-                tasks.append(Task(
-                    task_number=task_number,
-                    description=description,
-                    timer_minutes=minutes
-                ))
+                tasks.append(
+                    Task(
+                        task_number=task_number,
+                        description=description,
+                        timer_minutes=minutes,
+                    )
+                )
 
         return tasks
 
@@ -273,7 +280,7 @@ class AIHelper:
         max_iterations = len(new_minutes) * abs(drift) + 1  # Safety limit
         iterations = 0
         idx = 0
-        
+
         while drift != 0 and iterations < max_iterations:
             if drift > 0:
                 new_minutes[idx] += 1

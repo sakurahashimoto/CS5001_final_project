@@ -42,6 +42,7 @@ from task import Task
 # Session: One single task breakdown
 # Path to the file where all sessions are stored
 
+
 class Storage:
     def __init__(self, filename="data/sessions.json"):
         """
@@ -52,7 +53,6 @@ class Storage:
         """
         self.filename = filename
         self._initialize()
-
 
     def _initialize(self):
         """Create the data directory and file if they don't exist."""
@@ -67,7 +67,6 @@ class Storage:
         if data == {}:
             self._save_file({})
 
-
     def _save_file(self, data):
         """
         Save dictionary to JSON file.
@@ -76,7 +75,6 @@ class Storage:
         """
         with open(self.filename, "w") as file:
             json.dump(data, file)
-
 
     def _load_file(self):
         """
@@ -87,11 +85,10 @@ class Storage:
         try:
             with open(self.filename, "r") as file:
                 return json.load(file)
-        except FileNotFoundError:       # If file doesn't exist
+        except FileNotFoundError:  # If file doesn't exist
             return {}
-        except json.JSONDecodeError:    # If file is empty
+        except json.JSONDecodeError:  # If file is empty
             return {}
-
 
     def save_session(self, session):
         """
@@ -99,12 +96,13 @@ class Storage:
 
         :param session: Session object to save
         """
-        data = self._load_file()                        # Load all existing data
-        session_dict = session.to_dict()                # Convert Session object -> dictionary to save in JSON
+        data = self._load_file()  # Load all existing data
+        session_dict = (
+            session.to_dict()
+        )  # Convert Session object -> dictionary to save in JSON
         data[str(session.session_id)] = session_dict
 
         self._save_file(data)
-
 
     def get_session_by_id(self, session_id):
         """
@@ -115,14 +113,13 @@ class Storage:
         """
         data = self._load_file()
 
-        session_id_str = str(session_id)                # Convert to string in case UUID is passed
+        session_id_str = str(session_id)  # Convert to string in case UUID is passed
 
         if session_id_str in data:
             session = self._dict_to_session(data[session_id_str])
             return session  # May be None if data is invalid
 
         return None
-
 
     def get_unfinished_session(self):
         """
@@ -159,7 +156,6 @@ class Storage:
 
         return completed
 
-
     def get_total_completed_count(self):
         """
         Get total number of completed sessions (all time).
@@ -174,7 +170,6 @@ class Storage:
                 count += 1
 
         return count
-
 
     def delete_session(self, session_id):
         """
@@ -191,7 +186,6 @@ class Storage:
 
         self._save_file(data)
 
-
     def _dict_to_session(self, session_dict):
         """
         Convert dictionary to Session object.
@@ -206,7 +200,7 @@ class Storage:
                     task_number=task_dict.get("task_number", 0),
                     description=task_dict.get("description", ""),
                     timer_minutes=task_dict.get("timer_minutes", 5),
-                    status=task_dict.get("status", "pending")
+                    status=task_dict.get("status", "pending"),
                 )
                 tasks.append(task)
 
@@ -217,7 +211,7 @@ class Storage:
                 tasks=tasks,
                 current_task=session_dict.get("current_task", 0),
                 session_id=session_dict.get("session_id"),
-                created_at=session_dict.get("created_at")
+                created_at=session_dict.get("created_at"),
             )
         except (KeyError, TypeError, ValueError):
             # Invalid data - return None to skip this session

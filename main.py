@@ -91,14 +91,14 @@ def complete_task_callback():
     task_number = st.session_state[COMPLETE_TASK]
     try:
         app.complete_task(task_number)
-        st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉" )
+        st.toast(compliment_quotes.get_random_compliment_quote(), icon="🎉")
         st.balloons()
 
     except Exception as e:
         st.toast(str(e))
 
     st.session_state[COMPLETE_TASK] = ""
-   
+
 
 def complete_task_page():
     app = st.session_state[APP]
@@ -165,17 +165,25 @@ def tasks_main():
     if app.page == task_app.VIEW_COMPLETED_TASKS_PAGE:
         view_completed_tasks_page()
 
+
 def home():
     ai.render_welcome()
-    if st.button("🗺️ Strategic Planning (AI Coach)", key="goto_ai", use_container_width=True):
+    if st.button(
+        "🗺️ Strategic Planning (AI Coach)", key="goto_ai", use_container_width=True
+    ):
         st.session_state.page = "home"
         st.rerun()
-    
+
     st.write("")
 
-    if st.button("✅ Quick Daily Tasks (Task Manager)", key="goto_tasks", use_container_width=True):
+    if st.button(
+        "✅ Quick Daily Tasks (Task Manager)",
+        key="goto_tasks",
+        use_container_width=True,
+    ):
         st.session_state.page = TASKS_HOME
         st.rerun()
+
 
 def main():
     setup()

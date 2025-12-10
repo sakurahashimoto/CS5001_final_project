@@ -3,6 +3,7 @@ Author: Hyunjoo Shim (NUID: 002505607)
 timer.py
 Countdown timer for each task.
 """
+
 import time
 import sys
 import select
@@ -17,11 +18,10 @@ class Timer:
         self.is_paused = False
         self.stopped_early = False
 
-
     def start(self, minutes):
         """
         Start countdown timer.
-        
+
         How it works:
         1. Main loop runs every second, updating the progress bar
         2. Uses non-blocking input check (select) to detect ENTER key
@@ -67,7 +67,6 @@ class Timer:
             self._time_up()
             return "completed"
 
-
     def _check_for_input(self):
         """
         Check if user pressed Enter (non-blocking).
@@ -83,7 +82,6 @@ class Timer:
             pass
         return False
 
-
     def _handle_pause(self):
         """Handle pause menu."""
         self.is_paused = True
@@ -92,7 +90,9 @@ class Timer:
         print("  ⏸️  Paused!")
 
         while True:
-            print("  Type 'resume' to continue, or 'done' to finish: ", end="", flush=True)
+            print(
+                "  Type 'resume' to continue, or 'done' to finish: ", end="", flush=True
+            )
             choice = input().strip().lower()
 
             if choice == "done":
@@ -105,7 +105,6 @@ class Timer:
                 return
             else:
                 print("  Invalid input. Please type 'resume' or 'done'.")
-
 
     def _display_time(self):
         """Show the remaining time."""
@@ -129,8 +128,9 @@ class Timer:
         filled = int(bar_length * progress)
         bar = "█" * filled + "░" * (bar_length - filled)
 
-        print(f"\r  {bar} {percent}% complete | Time left: {mins:02d}:{secs:02d}", end="")  # Overwriting
-
+        print(
+            f"\r  {bar} {percent}% complete | Time left: {mins:02d}:{secs:02d}", end=""
+        )  # Overwriting
 
     def _time_up(self):
         """Notify user when timer is done."""
@@ -139,7 +139,6 @@ class Timer:
         print()
         self._play_alert_sound()
         print("⏰ Time's up! ⏰")
-
 
     def _play_alert_sound(self):
         """Play alert sound when timer finishes."""
@@ -150,15 +149,15 @@ class Timer:
 
         try:
             if system == "Darwin":  # macOS
-                os.system('afplay /System/Library/Sounds/Glass.aiff &')
+                os.system("afplay /System/Library/Sounds/Glass.aiff &")
             elif system == "Windows":
                 import winsound
+
                 winsound.MessageBeep()
             else:  # Linux
                 print("\a")  # Terminal bell
         except Exception:
             print("\a")  # Fallback to terminal bell
-
 
     def _stopped_message(self):
         """Notify user they stopped early."""

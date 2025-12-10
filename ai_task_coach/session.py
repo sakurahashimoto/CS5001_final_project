@@ -7,8 +7,18 @@ Represents one task breakdown session.
 from datetime import datetime
 import uuid
 
+
 class Session:
-    def __init__(self, goal, time_available, status="in_progress", tasks=None, current_task=0, session_id=None, created_at=None):
+    def __init__(
+        self,
+        goal,
+        time_available,
+        status="in_progress",
+        tasks=None,
+        current_task=0,
+        session_id=None,
+        created_at=None,
+    ):
         """
         Create a new session.
 
@@ -26,18 +36,17 @@ class Session:
         self.status = status
         self.tasks = tasks or []
         self.current_task = current_task
-        self.created_at = created_at if created_at else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+        self.created_at = (
+            created_at if created_at else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
 
     def pause(self):
         """Pause the session."""
         self.status = "paused"
 
-
     def complete(self):
         """Mark session as completed."""
         self.status = "completed"
-
 
     def get_current_task(self):
         """
@@ -49,13 +58,11 @@ class Session:
             return self.tasks[self.current_task]
         return None
 
-
     def next_task(self):
         """Move to the next task."""
         self.current_task += 1
         if self.current_task >= len(self.tasks):
             self.complete()
-
 
     def to_dict(self):
         """
@@ -70,7 +77,7 @@ class Session:
             "status": self.status,
             "current_task": self.current_task,
             "created_at": self.created_at,
-            "tasks": [task.to_dict() for task in self.tasks]
+            "tasks": [task.to_dict() for task in self.tasks],
         }
 
 
