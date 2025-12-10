@@ -19,7 +19,6 @@ class InputHandler:
         self._input = input_func or input
         self._print = print_func or print
 
-
     def get_goal(self):
         """
         Get and validate goal from user.
@@ -28,7 +27,9 @@ class InputHandler:
         """
         self._print()
         self._print("What do you want to accomplish today?")
-        self._print("(Tip: Be specific! e.g., 'study chapter 3 of discrete math' instead of 'study math')")
+        self._print(
+            "(Tip: Be specific! e.g., 'study chapter 3 of discrete math' instead of 'study math')"
+        )
         self._print()
         goal = self._input("Your goal: ").strip()
 
@@ -39,13 +40,14 @@ class InputHandler:
                 continue
 
             if self.ai and not self.ai.validate_goal(goal):
-                self._print("I didn't understand that. Please describe your goal more clearly.")
+                self._print(
+                    "I didn't understand that. Please describe your goal more clearly."
+                )
                 self._print()
                 goal = self._input("Your goal: ").strip()
                 continue
 
             return goal
-
 
     def get_time_available(self):
         """
@@ -54,12 +56,16 @@ class InputHandler:
         :return: time in minutes (positive integer)
         """
         self._print()
-        time_input = self._input("How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): ").strip()
+        time_input = self._input(
+            "How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): "
+        ).strip()
 
         while True:
             if not time_input:
                 self._print("No time entered. Please enter.")
-                time_input = self._input("How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): ").strip()
+                time_input = self._input(
+                    "How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): "
+                ).strip()
                 continue
 
             try:
@@ -68,11 +74,14 @@ class InputHandler:
                     return time_available
                 else:
                     self._print("Please enter a positive number.")
-                    time_input = self._input("How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): ").strip()
+                    time_input = self._input(
+                        "How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): "
+                    ).strip()
             except ValueError:
                 self._print("Please enter a number (e.g., 30, 60, 90).")
-                time_input = self._input("How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): ").strip()
-
+                time_input = self._input(
+                    "How much time do you have right now? Please enter in minutes. (e.g., 30, 60, 90): "
+                ).strip()
 
     def get_menu_choice(self, options, prompt="Your choice: "):
         """
@@ -91,7 +100,6 @@ class InputHandler:
                 return choice
 
             self._print("Invalid choice. Please try again.")
-
 
     def get_task_number(self, max_num):
         """
@@ -119,7 +127,6 @@ class InputHandler:
             except ValueError:
                 self._print("Invalid input. Please enter a number.")
 
-
     def get_new_time(self, task_description, current_time):
         """
         Get new time for a task.
@@ -128,7 +135,9 @@ class InputHandler:
         :param current_time: current time in minutes
         :return: new time in minutes, or None if invalid
         """
-        new_time = self._input(f"New time for '{task_description}' (current: {current_time} min): ").strip()
+        new_time = self._input(
+            f"New time for '{task_description}' (current: {current_time} min): "
+        ).strip()
 
         try:
             minutes = int(new_time)
@@ -140,7 +149,6 @@ class InputHandler:
         except ValueError:
             self._print("Invalid time. Please enter a number.")
             return None
-
 
     def get_extra_time(self):
         """
@@ -162,7 +170,6 @@ class InputHandler:
             self._print("Invalid input. Please enter a number.")
             return None
 
-
     def get_focus(self):
         """
         Get focus area from user.
@@ -172,7 +179,9 @@ class InputHandler:
         :return: focus string, or None if cancelled (empty input)
         """
         self._print()
-        focus = self._input("What would you like to focus on instead? (Press Enter to cancel): ").strip()
+        focus = self._input(
+            "What would you like to focus on instead? (Press Enter to cancel): "
+        ).strip()
 
         if not focus:
             return None
@@ -182,4 +191,3 @@ class InputHandler:
 
 if __name__ == "__main__":
     pass
-

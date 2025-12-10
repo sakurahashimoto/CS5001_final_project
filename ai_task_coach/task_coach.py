@@ -24,13 +24,11 @@ class TaskCoach:
         self.current_session = None
         self.time_available = None
 
-
     def start(self):
         """Start the task coach app."""
         total_completed = self.storage.get_total_completed_count()
         self.display.show_welcome(total_completed)
         self._show_main_menu()
-
 
     def _show_main_menu(self):
         """
@@ -45,7 +43,7 @@ class TaskCoach:
             print("1. Start a new goal")
             print("2. View completed goals (history)")
             if unfinished:
-                print(f"3. Continue previous session: \"{unfinished.goal}\"")
+                print(f'3. Continue previous session: "{unfinished.goal}"')
             print("q. Quit")
             print()
 
@@ -72,7 +70,6 @@ class TaskCoach:
                 print("Invalid choice.")
                 print()
 
-
     def _show_history(self):
         """Show completed sessions."""
         completed = self.storage.get_completed_sessions()
@@ -90,7 +87,6 @@ class TaskCoach:
             print("-" * 30)
             print()
 
-
     def _handle_existing_session(self, session):
         """
         Handle existing session when user wants to start a new goal.
@@ -98,7 +94,7 @@ class TaskCoach:
         :param session: the existing unfinished Session object
         """
         print()
-        print(f"You have an existing session: \"{session.goal}\"")
+        print(f'You have an existing session: "{session.goal}"')
         print("Starting a new goal will delete this session.")
         print()
         print("1. Delete and start new")
@@ -111,7 +107,6 @@ class TaskCoach:
             self.storage.delete_session(session.session_id)
             self._start_new_session()
         # choice == "2" just returns to main menu loop
-
 
     def _continue_session(self, session):
         """
@@ -126,7 +121,6 @@ class TaskCoach:
         self.display.show_tasks(session.tasks)
         self._run_session()
 
-
     def _start_new_session(self):
         """Get task from user and create new session."""
         goal = self.input.get_goal()
@@ -139,14 +133,17 @@ class TaskCoach:
         tasks = self.ai.break_down_goal(goal, self.time_available)
 
         if not tasks:
-            print("Sorry, I couldn't break down your goal. Please try again with a different description.")
+            print(
+                "Sorry, I couldn't break down your goal. Please try again with a different description."
+            )
             return
 
-        self.current_session = Session(goal=goal, time_available=self.time_available, tasks=tasks)
+        self.current_session = Session(
+            goal=goal, time_available=self.time_available, tasks=tasks
+        )
         self.storage.save_session(self.current_session)
 
         self._confirm_tasks()
-
 
     def _confirm_tasks(self, regenerate_count=0):
         """
@@ -160,7 +157,6 @@ class TaskCoach:
         choice = self._show_confirm_menu(can_regenerate, regenerate_count)
 
         self._handle_confirm_choice(choice, regenerate_count, can_regenerate)
-
 
     def _show_confirm_menu(self, can_regenerate, regenerate_count):
         """
@@ -195,7 +191,6 @@ class TaskCoach:
         options.append("q")
         return self.input.get_menu_choice(options)
 
-
     def _handle_confirm_choice(self, choice, regenerate_count, can_regenerate):
         """
         Handle user's choice from confirm menu.
@@ -220,13 +215,11 @@ class TaskCoach:
             print("Invalid choice.")
             self._confirm_tasks(regenerate_count)
 
-
     def _quit_session(self):
         """Save and quit current session."""
         self.current_session.pause()
         self.storage.save_session(self.current_session)
         print("Session saved. See you next time!")
-
 
     def _adjust_time(self, regenerate_count):
         """
@@ -256,7 +249,6 @@ class TaskCoach:
 
         self._confirm_tasks(regenerate_count)
 
-
     def _regenerate(self, adjust_type, regenerate_count):
         """
         Regenerate tasks with adjustment.
@@ -268,7 +260,9 @@ class TaskCoach:
         print("Let me try a different approach...")
         print()
 
-        tasks = self.ai.break_down_goal(self.current_session.goal, self.time_available, adjust=adjust_type)
+        tasks = self.ai.break_down_goal(
+            self.current_session.goal, self.time_available, adjust=adjust_type
+        )
 
         if tasks:
             self.current_session.tasks = tasks
@@ -277,7 +271,6 @@ class TaskCoach:
         else:
             print("Sorry, I couldn't regenerate. Let's keep the current plan.")
             self._confirm_tasks(regenerate_count)
-
 
     def _handle_different_focus(self, regenerate_count):
         """
@@ -296,7 +289,12 @@ class TaskCoach:
         print("Let me adjust the focus...")
         print()
 
-        tasks = self.ai.break_down_goal(self.current_session.goal, self.time_available, adjust="different_focus", focus=focus)
+        tasks = self.ai.break_down_goal(
+            self.current_session.goal,
+            self.time_available,
+            adjust="different_focus",
+            focus=focus,
+        )
 
         if tasks:
             self.current_session.tasks = tasks
@@ -305,7 +303,6 @@ class TaskCoach:
         else:
             print("Sorry, I couldn't adjust the focus. Let's keep the current plan.")
             self._confirm_tasks(regenerate_count)
-
 
     def _run_session(self):
         """Run through each task with timer."""
@@ -325,13 +322,11 @@ class TaskCoach:
             if not self._handle_task(task):
                 return
 
-
     def _complete_session(self):
         """Complete the current session."""
         self.current_session.complete()
         self.storage.save_session(self.current_session)
         self.display.show_summary(self.current_session)
-
 
     def _handle_task(self, task):
         """
@@ -342,14 +337,18 @@ class TaskCoach:
         """
         # Show current task with progress
         total_tasks = len(self.current_session.tasks)
-        completed_tasks = sum(1 for t in self.current_session.tasks if t.status == "completed")
+        completed_tasks = sum(
+            1 for t in self.current_session.tasks if t.status == "completed"
+        )
         print(f"📌 Task {task.task_number} of {total_tasks}: {task.description}")
         print(f"   Time: {task.timer_minutes} minutes")
         print(f"   Progress: {completed_tasks}/{total_tasks} completed")
         print()
 
         # Ask if ready
-        ready = self.input.get_menu_choice(["yes", "y", "", "skip", "quit"], "Ready to start? (yes/skip/quit): ")
+        ready = self.input.get_menu_choice(
+            ["yes", "y", "", "skip", "quit"], "Ready to start? (yes/skip/quit): "
+        )
 
         if ready in ["yes", "y", ""]:
             self.timer.start(task.timer_minutes)
@@ -369,13 +368,12 @@ class TaskCoach:
 
         return True
 
-
     def _handle_task_completion(self, task):
         """
         Ask user how the task went after timer.
 
         :param task: the Task that was just worked on
-        
+
         Note: If user chooses "Need more time", _extend_time() will call
         this function again after the extra timer finishes.
         That's why we return early in choice "2" - to avoid double next_task().
@@ -407,7 +405,6 @@ class TaskCoach:
 
         self.storage.save_session(self.current_session)
         self.current_session.next_task()
-
 
     def _extend_time(self, task):
         """

@@ -1,4 +1,4 @@
-#Sakura Hashimoto
+# Sakura Hashimoto
 import random
 
 COMPLIMENT = [
@@ -23,6 +23,7 @@ COMPLIMENT = [
     "Your commitment is showing results.",
     "Hard work done right. Fantastic.",
 ]
+
 
 def get_random_compliment_quote():
     return random.choice(COMPLIMENT)
