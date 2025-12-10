@@ -1,5 +1,5 @@
 """
-Hyunjoo Shim (NUID: 002505607)
+Author: Hyunjoo Shim (NUID: 002505607)
 session.py
 Represents one task breakdown session.
 """

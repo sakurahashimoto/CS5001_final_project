@@ -1,5 +1,5 @@
 """
-Hyunjoo Shim (NUID: 002505607)
+Author: Hyunjoo Shim (NUID: 002505607)
 storage.py
 Handles saving and loading session data to/from JSON file.
 

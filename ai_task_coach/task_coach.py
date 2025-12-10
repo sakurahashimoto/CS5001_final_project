@@ -1,5 +1,5 @@
 """
-Hyunjoo Shim (NUID: 002505607)
+Author: Hyunjoo Shim (NUID: 002505607)
 task_coach.py
 Main app - coordinates all the other modules (timer, display, storage, etc.)
 to run the task coaching session from start to finish.
