@@ -1,5 +1,5 @@
 """
-Hyunjoo Shim (NUID: 002505607)
+Author: Hyunjoo Shim (NUID: 002505607)
 task.py
 Represents one small task in a task breakdown.
 """

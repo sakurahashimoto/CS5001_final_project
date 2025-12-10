@@ -1,5 +1,5 @@
 """
-Critical Functions Test Suite
+Author: Critical Functions Test Suite
 Tests the most important functions across all modules for core functionality.
 """
 import pytest

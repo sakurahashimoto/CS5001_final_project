@@ -1,5 +1,5 @@
 """
-Hyunjoo Shim (NUID: 002505607)
+Author: Hyunjoo Shim (NUID: 002505607)
 ai_helper.py
 Connects to Gemini AI to break down a goal into small tasks.
 """

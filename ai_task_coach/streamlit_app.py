@@ -1,5 +1,5 @@
 """
-Hyunjoo Shim (NUID: 002505607)
+Author: Hyunjoo Shim (NUID: 002505607)
 streamlit_app.py
 Streamlit web UI for the Task Coach app.
 Run with: streamlit run ai_task_coach/streamlit_app.py
