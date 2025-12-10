@@ -42,7 +42,7 @@ class TestCriticalFunctions:
             "status": "completed"
         }
         # Verify it can be JSON serialized
-        json.dumps(result)
+        assert json.dumps(result) is not None
     
     # From session.py
     
@@ -111,8 +111,14 @@ class TestCriticalFunctions:
         assert result["current_task"] == 1
         assert result["created_at"] == created_at
         assert len(result["tasks"]) == 2
+        # Verify task data is correctly serialized
+        assert result["tasks"][0]["task_number"] == 1
+        assert result["tasks"][0]["description"] == "Task 1"
+        assert result["tasks"][0]["status"] == "completed"
+        assert result["tasks"][1]["task_number"] == 2
+        assert result["tasks"][1]["status"] == "pending"
         # Verify it can be JSON serialized
-        json.dumps(result)
+        assert json.dumps(result) is not None
     
     def test_session_complete(self):
         """Critical: Session.complete() - Mark session as completed."""
@@ -233,8 +239,10 @@ class TestCriticalFunctions:
             assert session.current_task == 0
             assert len(session.tasks) == 2
             assert session.tasks[0].task_number == 1
+            assert session.tasks[0].description == "Task 1"
             assert session.tasks[0].status == "pending"
             assert session.tasks[1].task_number == 2
+            assert session.tasks[1].description == "Task 2"
             assert session.tasks[1].status == "completed"
         finally:
             os.unlink(temp_filename)
@@ -258,14 +266,17 @@ class TestCriticalFunctions:
         assert tasks[1].description == "Read chapter 1"
         assert tasks[1].timer_minutes == 15
         assert tasks[2].task_number == 3
+        assert tasks[2].description == "Take notes"
         assert tasks[2].timer_minutes == 10
     
     def test_ai_helper_validate_goal(self):
         """Critical: AIHelper.validate_goal() - Validate user input."""
         mock_model = Mock()
-        mock_response = Mock()
-        mock_response.text = "YES"
-        mock_model.generate_content.return_value = mock_response
+        
+        # Test valid goal
+        mock_response_valid = Mock()
+        mock_response_valid.text = "YES"
+        mock_model.generate_content.return_value = mock_response_valid
         
         helper = AIHelper(model=mock_model)
         result = helper.validate_goal("Study discrete math")
@@ -274,6 +285,10 @@ class TestCriticalFunctions:
         mock_model.generate_content.assert_called_once()
         
         # Test invalid goal
-        mock_response.text = "NO"
+        mock_response_invalid = Mock()
+        mock_response_invalid.text = "NO"
+        mock_model.generate_content.return_value = mock_response_invalid
+        
         result = helper.validate_goal("x")
         assert result is False
+        assert mock_model.generate_content.call_count == 2

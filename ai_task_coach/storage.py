@@ -219,7 +219,7 @@ class Storage:
                 session_id=session_dict.get("session_id"),
                 created_at=session_dict.get("created_at")
             )
-        except (KeyError, TypeError, ValueError) as e:
+        except (KeyError, TypeError, ValueError):
             # Invalid data - return None to skip this session
             return None
 

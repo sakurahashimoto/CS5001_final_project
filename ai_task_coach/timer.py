@@ -114,8 +114,12 @@ class Timer:
 
         # Calculate progress
         elapsed = self.total_seconds - self.remaining_seconds
-        progress = elapsed / self.total_seconds
-        percent = int((elapsed / self.total_seconds) * 100)
+        if self.total_seconds > 0:
+            progress = elapsed / self.total_seconds
+            percent = int((elapsed / self.total_seconds) * 100)
+        else:
+            progress = 0
+            percent = 0
 
         # Build progress bar
         # "█" * 5 =     "█████"

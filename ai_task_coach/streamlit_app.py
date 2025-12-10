@@ -21,7 +21,6 @@ if current_dir not in sys.path:
 from storage import Storage
 from ai_helper import AIHelper
 from session import Session
-from task import Task
 
 # PAGE CONFIG & STYLING
 
@@ -942,7 +941,6 @@ def run_timer(task):
     total_tasks = len(session.tasks)
     
     # Create placeholders
-    task_info_placeholder = st.empty()
     timer_placeholder = st.empty()
     pause_banner_placeholder = st.empty()
     button_placeholder = st.empty()

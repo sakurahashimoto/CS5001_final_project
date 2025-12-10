@@ -21,12 +21,12 @@ class AIHelper:
                 raise ValueError("GEMINI_API_KEY is required. Please set it in .env file.")
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
-                # Try gemini-2.5-flash, fallback to gemini-2.0-flash if needed
+                # Try gemini-2.5-flash-lite, fallback to gemini-2.5-flash if needed
                 try:
-                    self.model = genai.GenerativeModel("gemini-2.5-flash")
+                    self.model = genai.GenerativeModel("gemini-2.5-flash-lite")
                 except Exception:
-                    # Fallback to 1.5-flash if 2.0-flash is not available
-                    self.model = genai.GenerativeModel("gemini-2.0-flash")
+                    # Fallback to gemini-2.5-flash if gemini-2.5-flash-lite is not available
+                    self.model = genai.GenerativeModel("gemini-2.5-flash")
             except Exception as e:
                 raise ValueError(f"Failed to initialize Gemini API: {str(e)}. Please check your API key.")
         else:
@@ -270,8 +270,11 @@ class AIHelper:
 
         # Fix rounding drift to hit the exact total
         drift = time_available - sum(new_minutes)
+        max_iterations = len(new_minutes) * abs(drift) + 1  # Safety limit
+        iterations = 0
         idx = 0
-        while drift != 0 and idx < len(new_minutes):
+        
+        while drift != 0 and iterations < max_iterations:
             if drift > 0:
                 new_minutes[idx] += 1
                 drift -= 1
@@ -280,6 +283,7 @@ class AIHelper:
                     new_minutes[idx] -= 1
                     drift += 1
             idx = (idx + 1) % len(new_minutes)
+            iterations += 1
 
         for t, minutes in zip(tasks, new_minutes):
             t.timer_minutes = minutes
