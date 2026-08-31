@@ -1,10 +1,25 @@
-# CS5001 Final Project
+# Gamified Task Manager
 
-## Description
+An interactive TODO web app built with Python and Streamlit that prompts you to break tasks into manageable chunks and gamifies getting stuff done.
 
-This project is a simple TODO application that helps you make progress on difficult tasks
-by prompting you to break tasks up into mangeable chunks and gamifying getting stuff done.
+## Features
+
+- **Task Breakdown:** Decompose complex tasks into smaller, actionable subtasks.
+- **Progress Tracking:** Visual feedback as tasks are completed to keep momentum.
+- **Interactive UI:** Clean web interface built with Streamlit.
+
+## Tech Stack
+
+- Python 3
+- Streamlit
+- uv
 
 ## Using / Running This Project
-* Fetch all required dependencies: `uv sync`
-* `uv run streamlit run main.py`
+
+- Fetch all required dependencies: `uv sync`
+- Run the app: `uv run streamlit run main.py`
+
+## Contributors
+
+- **Sakura Hashimoto** — [GitHub](https://github.com/sakurahashimoto) · [LinkedIn](https://www.linkedin.com/in/sakura-hashimoto-2768b3205)
+- **Hyunjoo Shim** — [GitHub](https://github.com/hjooshim)
